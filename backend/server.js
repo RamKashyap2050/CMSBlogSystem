@@ -39,6 +39,7 @@ app.use(
       collectionName: "sessions", // Collection name for session data
       ttl: 30 * 24 * 60 * 60, // Session expiration in seconds (30 days)
     }),
+    proxy: true, // Required for Heroku & Digital Ocean (regarding X-Forwarded-For)
     resave: false,
     saveUninitialized: false,
     cookie: {
