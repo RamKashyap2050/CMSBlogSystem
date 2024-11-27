@@ -20,7 +20,7 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? "https://careerforgedhere.vercel.app"
+        ? "https://cms-blog-system.vercel.app/"
         : "http://localhost:5173",
     credentials: true,
   })
@@ -42,7 +42,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production", // Secure cookies in production
+      secure: true,
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000, // Cookie expiration (30 days)
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
