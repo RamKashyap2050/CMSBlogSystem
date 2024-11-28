@@ -229,20 +229,37 @@ const IndividualBlog = () => {
                     className="flex flex-col space-y-2 bg-gray-100 p-4 rounded shadow-sm"
                   >
                     {/* User's Comment */}
-                    <div className="flex items-start space-x-4">
+                    <div className="flex items-start space-x-4 bg-gray-100 p-4 rounded-lg shadow-sm">
                       <img
                         src={
                           comment.user_id.image ||
                           "https://via.placeholder.com/150"
                         } // Fallback image
                         alt={comment.user_id.user_name}
-                        className="w-10 h-10 rounded-full"
+                        className="w-12 h-12 rounded-full border border-gray-300 shadow"
                       />
-                      <div>
-                        <h3 className="font-bold text-gray-800">
-                          {comment.user_id.user_name}
-                        </h3>
-                        <p className="text-gray-600">{comment.comment}</p>
+                      <div className="flex-grow">
+                        <div className="flex justify-between items-center">
+                          {/* User Name */}
+                          <h3 className="font-bold text-gray-800">
+                            {comment.user_id.user_name}
+                          </h3>
+                          {/* Love by Author */}
+                          {comment.admin_liked_comment && (
+                            <div className="flex items-center space-x-2">
+                              <span
+                                role="img"
+                                aria-label="Love by Author"
+                                className="text-red-500 text-lg"
+                              >
+                                ❤️
+                              </span>
+                           
+                            </div>
+                          )}
+                        </div>
+                        {/* User Comment */}
+                        <p className="text-gray-600 mt-2">{comment.comment}</p>
                       </div>
                     </div>
 
@@ -269,11 +286,7 @@ const IndividualBlog = () => {
                               comment.admin_id.admin_name &&
                               comment.admin_id.admin_name}
                             {/* Verified Badge */}
-                            <span
-                              title="Verified Admin"
-                            >
-                              😎 
-                            </span>
+                            <span title="Verified Admin">😎</span>
                           </h3>
                           <p className="text-gray-600">{comment.admin_reply}</p>
                         </div>

@@ -1,9 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import logo from "../asitravel.jpg"; // Replace with the correct path to your logo
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    user_name: "",
+    email: "",
+    message: "",
+  });
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("/users/contact", formData); // Adjust API endpoint as per your backend
+      if (response.status === 200) {
+        setSuccessMessage("Message sent successfully! I'll get back to you soon.");
+        setFormData({ user_name: "", email: "", message: "" }); // Clear form after successful submission
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setErrorMessage("Failed to send the message. Please try again later.");
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -37,17 +64,19 @@ const Contact = () => {
           </p>
 
           {/* Form */}
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
-                htmlFor="name"
+                htmlFor="user_name"
                 className="block text-gray-700 font-medium mb-2"
               >
                 Your Name
               </label>
               <input
                 type="text"
-                id="name"
+                id="user_name"
+                value={formData.user_name}
+                onChange={handleChange}
                 placeholder="Enter your name"
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
@@ -63,6 +92,8 @@ const Contact = () => {
               <input
                 type="email"
                 id="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Enter your email"
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
@@ -77,6 +108,8 @@ const Contact = () => {
               </label>
               <textarea
                 id="message"
+                value={formData.message}
+                onChange={handleChange}
                 rows="5"
                 placeholder="Let me know how I can help you!"
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -90,6 +123,14 @@ const Contact = () => {
               Send Message
             </button>
           </form>
+
+          {/* Success and Error Messages */}
+          {successMessage && (
+            <p className="text-green-600 mt-4 text-center">{successMessage}</p>
+          )}
+          {errorMessage && (
+            <p className="text-red-600 mt-4 text-center">{errorMessage}</p>
+          )}
         </div>
 
         {/* Footer Section */}

@@ -42,13 +42,17 @@ const blogSchema = mongoose.Schema(
           type: Date,
           default: Date.now, // Timestamp for the comment
         },
-        admin_reply:{
-          type: String
+        admin_reply: {
+          type: String,
         },
-        admin_id:{
+        admin_id: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Admin", // Admin reply to the comment
-        }
+        },
+        admin_liked_comment: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
     archived: {

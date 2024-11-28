@@ -36,10 +36,10 @@ const AdminViewSingleBlog = () => {
   const handleReply = async (commentId) => {
     const reply = replyInputs[commentId]?.trim();
     if (!reply) return;
-  
+
     try {
       let admin_id = null; // Declare admin_id outside the block
-  
+
       const admin = localStorage.getItem("Admin");
       console.log(admin);
       if (admin) {
@@ -50,13 +50,16 @@ const AdminViewSingleBlog = () => {
         console.log("No admin data found in localStorage.");
         return; // Exit early if admin is not found
       }
-  
-      const response = await axios.post(`/admin/api/addadminreply/${blog._id}`, {
-        commentId,
-        admin_id, // Send the correct admin ID
-        reply,
-      });
-  
+
+      const response = await axios.post(
+        `/admin/api/addadminreply/${blog._id}`,
+        {
+          commentId,
+          admin_id, // Send the correct admin ID
+          reply,
+        }
+      );
+
       // Update the comments with the new reply
       setBlog((prevBlog) => ({
         ...prevBlog,
@@ -70,7 +73,7 @@ const AdminViewSingleBlog = () => {
             : comment
         ),
       }));
-  
+
       // Clear the reply input for this comment
       setReplyInputs((prevReplies) => ({
         ...prevReplies,
@@ -80,7 +83,6 @@ const AdminViewSingleBlog = () => {
       console.error("Error adding reply:", error);
     }
   };
-  
 
   if (loading) {
     return <div className="text-center text-gray-500">Loading blog...</div>;
@@ -141,7 +143,7 @@ const AdminViewSingleBlog = () => {
                     <div className="ml-10 mt-2 bg-gray-50 p-2 rounded shadow-sm flex items-start space-x-4">
                       <img
                         src={
-                          comment.admin_id?.admin_image ||
+                          comment.admin_id?.image ||
                           "https://via.placeholder.com/150"
                         }
                         alt={comment.admin_id?.admin_name || "Admin"}
@@ -157,20 +159,28 @@ const AdminViewSingleBlog = () => {
                   )}
                   {/* Add Reply Input */}
                   <div className="mt-2">
-                    <textarea
-                      value={replyInputs[comment._id] || ""}
-                      onChange={(e) =>
-                        handleReplyChange(comment._id, e.target.value)
-                      }
-                      placeholder="Write a reply..."
-                      className="w-full h-10 p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      onClick={() => handleReply(comment._id)}
-                      className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      Reply
-                    </button>
+                    {comment.admin_reply ? (
+                      // If admin_reply exists, display the reply
+                      <></>
+                    ) : (
+                      // If admin_reply does not exist, show the input and button for adding a reply
+                      <>
+                        <textarea
+                          value={replyInputs[comment._id] || ""}
+                          onChange={(e) =>
+                            handleReplyChange(comment._id, e.target.value)
+                          }
+                          placeholder="Write a reply..."
+                          className="w-full h-10 p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                          onClick={() => handleReply(comment._id)}
+                          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                          Reply
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))

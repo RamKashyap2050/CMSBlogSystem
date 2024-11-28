@@ -21,13 +21,20 @@ const About = () => {
           ></video>
 
           {/* Overlay */}
-          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70"></div>
 
           {/* Content */}
           <div className="relative z-10 text-center">
-            <h1 className="text-white text-5xl font-bold shadow-lg bg-black bg-opacity-70 p-6 rounded-lg" style={{fontFamily:"billabong"}}>
+            <h1
+              className="text-white text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent p-6 rounded-lg"
+              style={{ fontFamily: "Poppins, sans-serif" }}
+            >
               Hi, I'm Varsha Reddy
             </h1>
+            <p className="text-gray-300 text-lg mt-4 max-w-xl mx-auto">
+              Welcome to my world of travel and exploration. Join me as I share
+              stories, tips, and adventures from around the globe.
+            </p>
           </div>
         </div>
 
@@ -70,73 +77,97 @@ const About = () => {
           </div>
         </div>
 
-        {/* Travel Highlights Section */}
         <div className="max-w-6xl mx-auto mt-10 p-6">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              My Travel Highlights
-            </h2>
+  <div className="bg-white rounded-lg shadow-lg p-8">
+    <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">My Travel Highlights</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Canada Section */}
-              <div>
-                <h3 className="text-2xl font-semibold text-blue-600 mb-2">
-                  Canada
-                </h3>
-                <p className="text-gray-700">
-                  Living in Canada has given me the chance to explore stunning
-                  landscapes and vibrant cities. From the bustling streets of
-                  Toronto to the serene beauty of Nova Scotia and Cape Breton, I
-                  ’ve fallen in love with the breathtaking nature and the
-                  hospitality of the people here.
-                </p>
-              </div>
+    {/* Timeline Container */}
+    <div className="relative">
+      {/* Vertical Line for Large Screens */}
+      <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full border-l-4 border-blue-600"></div>
 
-              {/* Europe Section */}
-              <div>
-                <h3 className="text-2xl font-semibold text-blue-600 mb-2">
-                  Europe
-                </h3>
-                <p className="text-gray-700">
-                  My European adventures have taken me from the majestic Alps in
-                  Austria to the romantic streets of Paris in France. Germany,
-                  with its historic charm, and the Czech Republic, with its
-                  cobblestone streets, have left lasting impressions on me.
-                </p>
-              </div>
-
-              {/* India Section */}
-              <div>
-                <h3 className="text-2xl font-semibold text-blue-600 mb-2">
-                  India
-                </h3>
-                <p className="text-gray-700">
-                  As an Indian by birth, my love for India runs deep. Whether
-                  it's the beaches of Goa, the lush greenery of Coorg, or the
-                  spiritual aura of Amritsar, every place holds a special place
-                  in my heart. Completing the Kedarkantha Trek was an
-                  unforgettable experience, and it's one of the many reasons why
-                  I feel most at home in the mountains.
-                </p>
-              </div>
-
-              {/* Trekking Adventures */}
-              <div>
-                <h3 className="text-2xl font-semibold text-blue-600 mb-2">
-                  Trekking and Mountaineering
-                </h3>
-                <p className="text-gray-700">
-                  Trekking and mountaineering have always been my favorite ways
-                  to challenge myself. The Kedarkantha Trek in the Indian
-                  Himalayas stands out as one of the toughest yet most rewarding
-                  journeys I've undertaken. There's something magical about
-                  standing at the summit, surrounded by snow-capped peaks and a
-                  sense of accomplishment.
-                </p>
-              </div>
-            </div>
+      {/* Section 1 */}
+      <div className="mb-12 flex flex-col md:flex-row items-center">
+        <div className="w-full md:w-1/2 md:pr-8 text-left md:text-right">
+          <h3 className="text-2xl font-semibold text-blue-600 mb-2">India</h3>
+          <p className="text-gray-700">
+            As an Indian by birth, my love for India runs deep. Whether it's the
+            beaches of Goa, the lush greenery of Coorg, or the spiritual aura of
+            Amritsar, every place holds a special place in my heart. Completing
+            the Kedarkantha Trek was an unforgettable experience, and it's one of
+            the many reasons why I feel most at home in the mountains.
+          </p>
+        </div>
+        <div className="relative flex-shrink-0 hidden md:flex">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+            ✈️
           </div>
         </div>
+        <div className="w-full md:w-1/2"></div>
+      </div>
+
+      {/* Section 2 */}
+      <div className="mb-12 flex flex-col md:flex-row-reverse items-center">
+        <div className="w-full md:w-1/2 md:pl-8 text-left">
+          <h3 className="text-2xl font-semibold text-blue-600 mb-2">Canada</h3>
+          <p className="text-gray-700">
+            Living in Canada has given me the chance to explore stunning
+            landscapes and vibrant cities. From the bustling streets of Toronto to
+            the serene beauty of Nova Scotia and Cape Breton, I’ve fallen in love
+            with the breathtaking nature and the hospitality of the people here.
+          </p>
+        </div>
+        <div className="relative flex-shrink-0 hidden md:flex">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+            ✈️
+          </div>
+        </div>
+        <div className="w-full md:w-1/2"></div>
+      </div>
+
+      {/* Section 3 */}
+      <div className="mb-12 flex flex-col md:flex-row items-center">
+        <div className="w-full md:w-1/2 md:pr-8 text-left md:text-right">
+          <h3 className="text-2xl font-semibold text-blue-600 mb-2">Europe</h3>
+          <p className="text-gray-700">
+            My European adventures have taken me from the majestic Alps in Austria
+            to the romantic streets of Paris in France. Germany, with its historic
+            charm, and the Czech Republic, with its cobblestone streets, have left
+            lasting impressions on me.
+          </p>
+        </div>
+        <div className="relative flex-shrink-0 hidden md:flex">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+            ✈️
+          </div>
+        </div>
+        <div className="w-full md:w-1/2"></div>
+      </div>
+
+      {/* Section 4 */}
+      <div className="mb-12 flex flex-col md:flex-row-reverse items-center">
+        <div className="w-full md:w-1/2 md:pl-8 text-left">
+          <h3 className="text-2xl font-semibold text-blue-600 mb-2">Trekking and Mountaineering</h3>
+          <p className="text-gray-700">
+            Trekking and mountaineering have always been my favorite ways to
+            challenge myself. The Kedarkantha Trek in the Indian Himalayas stands
+            out as one of the toughest yet most rewarding journeys I've
+            undertaken. There's something magical about standing at the summit,
+            surrounded by snow-capped peaks and a sense of accomplishment.
+          </p>
+        </div>
+        <div className="relative flex-shrink-0 hidden md:flex">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+            ✈️
+          </div>
+        </div>
+        <div className="w-full md:w-1/2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
         {/* Closing Section */}
         <div className="max-w-6xl mx-auto mt-10 p-6">
