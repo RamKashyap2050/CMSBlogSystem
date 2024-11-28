@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
+import ImageWithDimensionCheck from "../components/ImageWithDimensionCheck"
 import axios from "axios";
 
 const AdminViewSingleBlog = () => {
@@ -32,6 +33,28 @@ const AdminViewSingleBlog = () => {
       [commentId]: value,
     }));
   };
+
+  const handleAdminLikeCommentToggle = async (BlogId,commentId, currentLikeStatus) => {
+    try {
+      // Send PUT request to toggle like status
+      const response = await axios.put(`/admin/api/toggleCommentLike/${BlogId}/${commentId}`, {
+        admin_liked_comment: !currentLikeStatus,
+      });
+  
+      // Update the local state to reflect changes
+      setBlog((prevBlog) => ({
+        ...prevBlog,
+        comments: prevBlog.comments.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, admin_liked_comment: response.data.admin_liked_comment }
+            : comment
+        ),
+      }));
+    } catch (error) {
+      console.error("Error toggling admin like:", error);
+    }
+  };
+  
 
   const handleReply = async (commentId) => {
     const reply = replyInputs[commentId]?.trim();
@@ -101,11 +124,9 @@ const AdminViewSingleBlog = () => {
           <h1 className="text-4xl font-bold text-gray-800 text-center mb-4">
             {blog.title}
           </h1>
-          <img
-            src={blog.post_image}
-            alt={blog.title}
-            className="w-full h-64 object-cover rounded-lg shadow-md"
-          />
+          <div>
+            <ImageWithDimensionCheck src={blog.post_image} alt={blog.title} />
+          </div>
           <div className="mt-6 text-gray-700 text-lg leading-relaxed">
             {blog.content}
           </div>
@@ -131,13 +152,43 @@ const AdminViewSingleBlog = () => {
                       alt={comment.user_id.user_name}
                       className="w-10 h-10 rounded-full"
                     />
-                    <div>
-                      <h3 className="font-bold text-gray-800">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-800 flex justify-between items-center">
                         {comment.user_id.user_name}
+                        {/* Heart Icon */}
+                        <button
+                          onClick={() =>
+                            handleAdminLikeCommentToggle(
+                                blog._id,
+                              comment._id,
+                              comment.admin_liked_comment
+                            )
+                          }
+                          className="focus:outline-none"
+                        >
+                          {comment.admin_liked_comment ? (
+                            <span
+                              className="text-red-500 text-xl"
+                              role="img"
+                              aria-label="Liked"
+                            >
+                              ❤️
+                            </span>
+                          ) : (
+                            <span
+                              className="text-gray-400 text-xl"
+                              role="img"
+                              aria-label="Not Liked"
+                            >
+                              🤍
+                            </span>
+                          )}
+                        </button>
                       </h3>
                       <p className="text-gray-600">{comment.comment}</p>
                     </div>
                   </div>
+
                   {/* Admin Reply */}
                   {comment.admin_reply && (
                     <div className="ml-10 mt-2 bg-gray-50 p-2 rounded shadow-sm flex items-start space-x-4">

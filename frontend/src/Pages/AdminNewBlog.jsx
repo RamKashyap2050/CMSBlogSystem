@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Footer from "../components/Footer";
 import AdminNavbar from "../components/AdminNavbar";
 import axios from "axios";
+import { FaMagic } from "react-icons/fa"; // Magic icon
 
 const AdminNewBlog = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const AdminNewBlog = () => {
 
   const [image, setImage] = useState(null); // File state for image
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state for magic button
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,6 +24,41 @@ const AdminNewBlog = () => {
     setImage(e.target.files[0]); // Set the selected file
   };
 
+  const handleGenerateContent = async () => {
+    if (!formData.title.trim()) {
+      setMessage("Please enter a title to generate content.");
+      return;
+    }
+    setLoading(true); // Show loading spinner
+    setMessage(""); // Clear previous messages
+
+    try {
+      const response = await axios.post("/admin/api/generateContent", {
+        title: formData.title,
+      });
+
+      // Accessing the nested 'data' object
+      const { shortdescription, content } = response.data.data;
+
+      console.log("Generated Short Description:", shortdescription);
+      console.log("Generated Content:", content);
+
+      // Updating form data with the generated content
+      setFormData({
+        ...formData,
+        description: shortdescription,
+        content: content,
+      });
+
+      setMessage("Content generated successfully!");
+    } catch (error) {
+      console.error("Error generating content:", error);
+      setMessage("Failed to generate content. Please try again.");
+    } finally {
+      setLoading(false); // Hide loading spinner
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -29,21 +66,21 @@ const AdminNewBlog = () => {
         setMessage("Please select an image to upload.");
         return;
       }
-  
+
       // Retrieve admin details from localStorage
       const adminData = JSON.parse(localStorage.getItem("Admin"));
       if (!adminData || !adminData._id) {
         setMessage("Admin information is missing. Please log in again.");
         return;
       }
-  
+
       const formDataWithFile = new FormData();
       formDataWithFile.append("title", formData.title);
       formDataWithFile.append("description", formData.description);
       formDataWithFile.append("content", formData.content);
       formDataWithFile.append("image", image); // Append the file
       formDataWithFile.append("adminId", adminData._id); // Add AdminId
-  
+
       const response = await axios.post(
         "/admin/api/createblog",
         formDataWithFile,
@@ -53,7 +90,7 @@ const AdminNewBlog = () => {
           },
         }
       );
-  
+
       console.log("Blog Data Submitted:", response.data);
       setMessage("Blog created successfully!");
       setFormData({
@@ -67,7 +104,6 @@ const AdminNewBlog = () => {
       setMessage("Failed to create the blog. Please try again.");
     }
   };
-  
 
   return (
     <>
@@ -78,25 +114,40 @@ const AdminNewBlog = () => {
             Create New Blog
           </h1>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Title */}
-            <div>
+            {/* Title with Magic Icon */}
+            <div className="relative">
               <label
                 htmlFor="title"
                 className="block text-gray-700 font-medium mb-2"
               >
                 Blog Title
               </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter blog title"
-                required
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg p-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter blog title and click on Magic to see the Magic :)"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={handleGenerateContent}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-600 focus:outline-none"
+                  title="Generate Content"
+                >
+                  {loading ? (
+                    <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                  ) : (
+                    <FaMagic size={20} />
+                  )}
+                </button>
+              </div>
             </div>
+
             {/* Image Upload */}
             <div>
               <label

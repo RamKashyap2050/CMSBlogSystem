@@ -6,6 +6,8 @@ const Blogs = require("../models/Blogs");
 const { uploadImageToS3 } = require("../s3/s3");
 const Itinerary = require("../models/Iternary");
 const IternaryDay = require("../models/IternaryDay");
+const OpenAI = require("openai");
+
 
 const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -320,6 +322,92 @@ const addAdminReply = asyncHandler(async (req, res) => {
   }
 });
 
+//Toggle the like for Comment
+const togglecommentlike = asyncHandler(async(req,res) => {
+  try {
+    const { blogId, commentId } = req.params;
+    const { admin_liked_comment } = req.body;
+    console.log( blogId, commentId, admin_liked_comment )
+
+    // Find the blog and update the specific comment
+    const updatedBlog = await Blogs.findOneAndUpdate(
+      { _id: blogId, "comments._id": commentId },
+      {
+        $set: {
+          "comments.$.admin_liked_comment": admin_liked_comment,
+        },
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedBlog) {
+      return res.status(404).json({ message: "Blog or comment not found" });
+    }
+
+    res.status(200).json({ message: "Admin like toggled", updatedBlog });
+  } catch (error) {
+    console.error("Error toggling admin like:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+})
+const generateTravelContent = asyncHandler(async (req, res) => {
+  const { title } = req.body;
+  console.log(title)
+  if (!title) {
+    return res.status(400).json({
+      success: false,
+      message: "Title is required.",
+    });
+  }
+
+  try {
+    const prompt = `
+      You are a vivid traveler and creative content writer. Your task is to generate
+      a short description and detailed content for a travel destination based on the title provided below.
+
+      Title: ${title}
+
+      Guidelines:
+      1. Create a captivating short description (2-3 sentences) summarizing the essence of the place.
+      2. Write detailed content (150-200 words) elaborating on its history, attractions, and why it is worth visiting.
+      3. Use an engaging and vivid storytelling style as if you are writing for a travel blog.
+
+      Return the output in the following JSON format:
+      {
+        "shortdescription": "<short description>",
+        "content": "<detailed content>"
+      }
+    `;
+
+    const openai = new OpenAI();
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-2024-08-06", // Replace with your preferred model
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    // Get response text
+    let generatedOutput = completion.choices[0].message.content;
+
+    // Clean up response by removing Markdown formatting
+    generatedOutput = generatedOutput.replace(/```json|```/g, "").trim();
+
+    // Parse JSON
+    const structuredOutput = JSON.parse(generatedOutput);
+    console.log(structuredOutput)
+    res.status(200).json({
+      success: true,
+      data: structuredOutput,
+    });
+  } catch (error) {
+    console.error("Error generating travel content:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while generating travel content.",
+      error: error.message,
+    });
+  }
+});
+
 
 //Function to generate tokens
 const generateToken = async (id) => {
@@ -337,5 +425,7 @@ module.exports = {
   addItineraryDay,
   ViewIternaries,
   ViewSingleIternary,
-  addAdminReply
+  addAdminReply,
+  togglecommentlike,
+  generateTravelContent
 };

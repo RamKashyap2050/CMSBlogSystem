@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
+import ImageWithDimensionCheck from "../components/ImageWithDimensionCheck";
 
 const IndividualBlog = () => {
   const { id } = useParams();
@@ -135,11 +136,10 @@ const IndividualBlog = () => {
           <h1 className="text-4xl font-bold text-gray-800 text-center mb-4">
             {blog.title}
           </h1>
-          <img
-            src={blog.post_image}
-            alt={blog.title}
-            className="w-full h-64 object-cover rounded-lg shadow-md"
-          />
+          <div>
+            <ImageWithDimensionCheck src={blog.post_image} alt={blog.title} />
+          </div>
+
           <div className="mt-6 text-gray-700 text-lg leading-relaxed">
             {blog.content}
           </div>
@@ -254,7 +254,6 @@ const IndividualBlog = () => {
                               >
                                 ❤️
                               </span>
-                           
                             </div>
                           )}
                         </div>
