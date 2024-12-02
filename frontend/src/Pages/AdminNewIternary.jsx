@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Footer from "../components/Footer";
 import AdminNavbar from "../components/AdminNavbar";
 import axios from "axios";
+import { FaMagic } from "react-icons/fa"; // Magic icon
 
 const AdminNewItinerary = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,40 @@ const AdminNewItinerary = () => {
     dayNumber: "",
     activities: [],
   });
+  const [loading, setLoading] = useState(false); // Loading spinner for magic wand
+
+  const handleGenerateActivityDescription = async (index) => {
+    const activityName = currentDay.activities[index].name;
+    const itineraryId = JSON.parse(localStorage.getItem("itineraryId")); // Fetch itineraryId
+  
+    if (!activityName.trim() || !itineraryId) {
+      setMessage("Activity name and itinerary ID are required.");
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const response = await axios.post("/admin/api/generateActivityDescription", {
+        activityName,
+        itineraryId,
+      });
+  
+      const { activityDescription } = response.data.data;
+  
+      // Update activity description in state
+      const updatedActivities = currentDay.activities.map((activity, i) =>
+        i === index ? { ...activity, description: activityDescription } : activity
+      );
+      setCurrentDay({ ...currentDay, activities: updatedActivities });
+      setMessage("Activity description generated successfully!");
+    } catch (error) {
+      console.error("Error generating activity description:", error);
+      setMessage("Failed to generate activity description.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   // Handle form field changes for Step 1
   const handleChange = (e) => {
@@ -299,15 +334,30 @@ const AdminNewItinerary = () => {
               </h2>
               {currentDay.activities.map((activity, index) => (
                 <div key={index} className="mb-4">
-                  <input
-                    type="text"
-                    placeholder="Activity Name"
-                    value={activity.name}
-                    onChange={(e) =>
-                      handleActivityChange(index, "name", e.target.value)
-                    }
-                    className="w-full border rounded-lg p-2 mb-2"
-                  />
+                  <div className="relative mb-2">
+                    <input
+                      type="text"
+                      placeholder="Activity Name"
+                      value={activity.name}
+                      onChange={(e) =>
+                        handleActivityChange(index, "name", e.target.value)
+                      }
+                      className="w-full border rounded-lg p-2 pr-10" // Add padding-right for the button space
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleGenerateActivityDescription(index)}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-600 focus:outline-none"
+                      title="Generate Description"
+                    >
+                      {loading ? (
+                        <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                      ) : (
+                        <FaMagic size={20} />
+                      )}
+                    </button>
+                  </div>
+
                   <textarea
                     placeholder="Activity Description"
                     value={activity.description}

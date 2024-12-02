@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
-import ItineraryDay from "../components/IternaryDay";
+import AdminItineraryDay from"../components/AdminIternaryDay"
 import axios from "axios";
 
 const AdminViewSingleItinerary = () => {
@@ -10,6 +10,8 @@ const AdminViewSingleItinerary = () => {
   const [itinerary, setItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [newDay, setNewDay] = useState({ dayNumber: "", activities: [] });
+  const [newActivity, setNewActivity] = useState({ name: "", description: "", image: null });
 
   useEffect(() => {
     const fetchItinerary = async () => {
@@ -62,6 +64,46 @@ const AdminViewSingleItinerary = () => {
     }
   };
 
+  const handleAddDay = async () => {
+    try {
+      const response = await axios.post(`/admin/api/addday/${id}`, newDay);
+      setItinerary((prev) => ({
+        ...prev,
+        days: [...prev.days, response.data], // Add new day to days array
+      }));
+      setNewDay({ dayNumber: "", activities: [] });
+    } catch (err) {
+      console.error("Error adding day:", err);
+      alert("Failed to add day.");
+    }
+  };
+
+  const handleAddActivity = async (dayId) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", newActivity.name);
+      formData.append("description", newActivity.description);
+      if (newActivity.image) formData.append("image", newActivity.image);
+
+      const response = await axios.post(`/admin/api/addactivity/${dayId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setItinerary((prev) => ({
+        ...prev,
+        days: prev.days.map((day) =>
+          day._id === dayId
+            ? { ...day, activities: [...day.activities, response.data] }
+            : day
+        ),
+      }));
+      setNewActivity({ name: "", description: "", image: null });
+    } catch (err) {
+      console.error("Error adding activity:", err);
+      alert("Failed to add activity.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
@@ -96,15 +138,35 @@ const AdminViewSingleItinerary = () => {
           />
         </div>
         {itinerary.days.map((day) => (
-          <ItineraryDay
+          <AdminItineraryDay
             key={day._id}
             dayId={day._id}
             dayNumber={day.dayNumber}
             activities={day.activities}
             handleDeleteActivity={handleDeleteActivity}
             handleDeleteDay={handleDeleteDay}
+            handleAddActivity={handleAddActivity} // Pass to AdminItineraryDay
+            newActivity={newActivity} // Pass newActivity state
+            setNewActivity={setNewActivity} // Pass setter
           />
         ))}
+        {/* Add Day Section */}
+        <div className="mt-8 p-4 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Add a New Day</h2>
+          <input
+            type="text"
+            value={newDay.dayNumber}
+            onChange={(e) => setNewDay({ ...newDay, dayNumber: e.target.value })}
+            placeholder="Day Number"
+            className="w-full border rounded-lg p-2 mb-4"
+          />
+          <button
+            onClick={handleAddDay}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+          >
+            Add Day
+          </button>
+        </div>
       </div>
       <Footer />
     </>

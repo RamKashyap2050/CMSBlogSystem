@@ -84,7 +84,7 @@ const About = () => {
     {/* Timeline Container */}
     <div className="relative">
       {/* Vertical Line for Large Screens */}
-      <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full border-l-4 border-blue-600"></div>
+      <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full border-l-4 border-blue-300"></div>
 
       {/* Section 1 */}
       <div className="mb-12 flex flex-col md:flex-row items-center">
@@ -99,7 +99,7 @@ const About = () => {
           </p>
         </div>
         <div className="relative flex-shrink-0 hidden md:flex">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="w-8 h-8 bg-blue-300 rounded-full flex items-center justify-center text-white font-bold">
             ✈️
           </div>
         </div>
@@ -118,7 +118,7 @@ const About = () => {
           </p>
         </div>
         <div className="relative flex-shrink-0 hidden md:flex">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="w-8 h-8 bg-blue-300 rounded-full flex items-center justify-center text-white font-bold">
             ✈️
           </div>
         </div>
@@ -137,7 +137,7 @@ const About = () => {
           </p>
         </div>
         <div className="relative flex-shrink-0 hidden md:flex">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="w-8 h-8 bg-blue-300 rounded-full flex items-center justify-center text-white font-bold">
             ✈️
           </div>
         </div>
@@ -157,7 +157,7 @@ const About = () => {
           </p>
         </div>
         <div className="relative flex-shrink-0 hidden md:flex">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="w-8 h-8 bg-blue-300 rounded-full flex items-center justify-center text-white font-bold">
             ✈️
           </div>
         </div>

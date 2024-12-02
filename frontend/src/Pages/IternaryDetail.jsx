@@ -29,7 +29,9 @@ const ItineraryDetail = () => {
   }, [id]);
 
   if (loading) {
-    return <div className="text-center text-gray-500">Loading itinerary...</div>;
+    return (
+      <div className="text-center text-gray-500">Loading itinerary...</div>
+    );
   }
 
   if (error) {
@@ -54,13 +56,19 @@ const ItineraryDetail = () => {
         <p className="text-gray-600 text-center mb-4">
           {itinerary.totalDays} Days | {itinerary.totalNights} Nights
         </p>
-        {itinerary.days.map((day) => (
-          <ItineraryDay
-            key={day.dayNumber}
-            dayNumber={day.dayNumber}
-            activities={day.activities}
-          />
-        ))}
+        {itinerary.days
+          .sort((a, b) => {
+            const dayA = parseInt(a.dayNumber.replace("Day ", ""), 10) || 0;
+            const dayB = parseInt(b.dayNumber.replace("Day ", ""), 10) || 0;
+            return dayA - dayB;
+          })
+          .map((day) => (
+            <ItineraryDay
+              key={day.dayNumber}
+              dayNumber={day.dayNumber}
+              activities={day.activities}
+            />
+          ))}
       </div>
       <Footer />
     </>

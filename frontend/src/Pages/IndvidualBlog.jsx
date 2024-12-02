@@ -4,6 +4,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
 import ImageWithDimensionCheck from "../components/ImageWithDimensionCheck";
+import { AiOutlineHeart, AiFillHeart, AiOutlineComment, AiOutlineSave, AiFillSave } from "react-icons/ai";
+
 
 const IndividualBlog = () => {
   const { id } = useParams();
@@ -171,41 +173,44 @@ const IndividualBlog = () => {
             </p>
           </div>
 
-          <div className="mt-6 flex items-center space-x-6">
+          <div className="mt-6 flex items-center space-x-4">
             {/* Like Button */}
             <button
               onClick={() => handleLike(blog._id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded ${
+              className={`p-2 rounded-full transition ${
                 blog.liked_by.includes("currentUserId") // Replace with actual user ID
-                  ? "bg-blue-500 text-white"
+                  ? "bg-red-100 text-red-500"
                   : "bg-gray-200 text-gray-800"
-              }`}
+              } hover:bg-red-200`}
+              title="Like"
             >
-              <span>👍</span>
-              <span>
-                {blog.liked_by.length}{" "}
-                {blog.liked_by.length === 1 ? "Like" : "Likes"}
-              </span>
+              {blog.liked_by.includes("currentUserId") ? (
+                <AiFillHeart size={24} />
+              ) : (
+                <AiOutlineHeart size={24} />
+              )}
             </button>
 
             {/* Save Button */}
             <button
               onClick={handleSave}
-              className={`flex items-center space-x-2 px-4 py-2 rounded ${
-                saved ? "bg-green-500 text-white" : "bg-gray-200 text-gray-800"
-              }`}
+              className={`p-2 rounded-full transition ${
+                saved
+                  ? "bg-green-100 text-green-500"
+                  : "bg-gray-200 text-gray-800"
+              } hover:bg-green-200`}
+              title="Save"
             >
-              <span>📥</span>
-              <span>{saved ? "Saved" : "Save"}</span>
+              {saved ? <AiFillSave size={24} /> : <AiOutlineSave size={24} />}
             </button>
 
             {/* Comments Button */}
             <button
               onClick={() => setIsCommentsOpen((prev) => !prev)}
-              className="flex items-center space-x-2 px-4 py-2 rounded bg-gray-200 text-gray-800"
+              className="p-2 rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+              title="Comments"
             >
-              <span>💬</span>
-              <span>Comments</span>
+              <AiOutlineComment size={24} />
             </button>
           </div>
         </div>

@@ -11,6 +11,7 @@ const {
   addAdminReply,
   togglecommentlike,
   generateTravelContent,
+  generateActivityDescription,
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -26,5 +27,5 @@ router.route("/itinerary/:itineraryId").get(ViewSingleIternary);
 router.route("/addadminreply/:id").post(addAdminReply);
 router.route("/togglecommentlike/:blogId/:commentId").put(togglecommentlike);
 router.route("/generateContent").post(generateTravelContent);
-
+router.route("/generateActivityDescription").post(generateActivityDescription);
 module.exports = router;

@@ -408,6 +408,76 @@ const generateTravelContent = asyncHandler(async (req, res) => {
   }
 });
 
+const generateActivityDescription = asyncHandler(async (req, res) => {
+  const { activityName, itineraryId } = req.body;
+  console.log( activityName, itineraryId)
+  if (!activityName || !itineraryId) {
+    return res.status(400).json({
+      success: false,
+      message: "Activity name and itinerary ID are required.",
+    });
+  }
+
+  try {
+    // Fetch itinerary details
+    const itinerary = await Itinerary.findById(itineraryId);
+    if (!itinerary) {
+      return res.status(404).json({
+        success: false,
+        message: "Itinerary not found.",
+      });
+    }
+
+    const itineraryName = itinerary.destination;
+
+    // Generate content using GPT or AI
+    const prompt = `
+      You are a vivid traveler and creative content writer. Your task is to generate
+      a description for an activity in a travel itinerary. Use the following information:
+
+      Activity Name: ${activityName}
+      Itinerary Destination: ${itineraryName}
+
+      Guidelines:
+      1. Write a captivating description (50-100 words) that describes the activity in detail.
+      2. Include references to the destination (${itineraryName}) to make the description engaging and contextual.
+      3. Use a vivid storytelling style that excites travelers.
+
+      Return the output in the following JSON format:
+      {
+        "activityDescription": "<generated activity description>"
+      }
+    `;
+
+    const openai = new OpenAI();
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-2024-08-06", // Replace with your preferred model
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    // Get response text
+    let generatedOutput = completion.choices[0].message.content;
+
+    // Clean up response by removing Markdown formatting
+    generatedOutput = generatedOutput.replace(/```json|```/g, "").trim();
+
+    // Parse JSON
+    const structuredOutput = JSON.parse(generatedOutput);
+
+    res.status(200).json({
+      success: true,
+      data: structuredOutput,
+    });
+  } catch (error) {
+    console.error("Error generating activity description:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while generating the activity description.",
+      error: error.message,
+    });
+  }
+});
+
 
 //Function to generate tokens
 const generateToken = async (id) => {
@@ -427,5 +497,6 @@ module.exports = {
   ViewSingleIternary,
   addAdminReply,
   togglecommentlike,
-  generateTravelContent
+  generateTravelContent,
+  generateActivityDescription
 };
