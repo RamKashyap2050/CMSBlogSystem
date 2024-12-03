@@ -649,6 +649,62 @@ const DeleteActivity = asyncHandler(async (req, res) => {
   }
 });
 
+//Update Iternary Details
+const updateItinerary = asyncHandler(async (req, res) => {
+  const { id } = req.params; // Itinerary ID
+  const { totalDays, totalNights } = req.body;
+  const file = req.files?.photos; // Optional new photo upload
+
+  try {
+    // Find the itinerary by ID
+    const itinerary = await Itinerary.findById(id);
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found." });
+    }
+
+    // Update fields
+    if (totalDays) itinerary.totalDays = totalDays;
+    if (totalNights) itinerary.totalNights = totalNights;
+    if (file) {
+      const photoUrl = await uploadImageToS3(file); // Upload new photo
+      itinerary.photos = photoUrl;
+    }
+
+    // Save changes
+    await itinerary.save();
+    res.status(200).json(itinerary);
+  } catch (error) {
+    console.error("Error updating itinerary:", error);
+    res.status(500).json({ message: "Failed to update itinerary." });
+  }
+});
+
+const DeleteIternary = asyncHandler(async (req, res) => {
+  const { id } = req.params; // Itinerary ID
+
+  try {
+    // Find and delete the itinerary
+    const deletedItinerary = await Itinerary.findByIdAndDelete(id);
+
+    // If no itinerary is found, return a 404 error
+    if (!deletedItinerary) {
+      return res.status(404).json({ message: "Itinerary not found." });
+    }
+
+    // Delete all IternaryDay entries associated with this itinerary
+    const deletedDays = await IternaryDay.deleteMany({ itinerary: id });
+
+    res.status(200).json({
+      message: "Itinerary and associated days deleted successfully!",
+      deletedItinerary,
+      deletedDays: deletedDays.deletedCount, // Number of days deleted
+    });
+  } catch (error) {
+    console.error("Error deleting itinerary:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
 //Function to generate tokens
 const generateToken = async (id) => {
   return await jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -672,5 +728,7 @@ module.exports = {
   ManageActivityDynamically,
   ManageDayDynamically,
   DeleteDay,
-  DeleteActivity
+  DeleteActivity,
+  updateItinerary,
+  DeleteIternary
 };

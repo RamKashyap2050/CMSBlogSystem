@@ -16,6 +16,8 @@ const {
   ManageDayDynamically,
   DeleteDay,
   DeleteActivity,
+  updateItinerary,
+  DeleteIternary,
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -38,5 +40,6 @@ router
   .post(ManageActivityDynamically);
 router.route("/deleteDay/:dayId").delete(DeleteDay);
 router.route("/deleteActivity/:dayId/:activityId").delete(DeleteActivity);
-
+router.route("/updateitinerary/:id").put(updateItinerary);
+router.route("/deleteiternary/:id").delete(DeleteIternary);
 module.exports = router;
