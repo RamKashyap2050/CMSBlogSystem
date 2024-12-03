@@ -4,11 +4,17 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
 import ImageWithDimensionCheck from "../components/ImageWithDimensionCheck";
-import { AiOutlineHeart, AiFillHeart, AiOutlineComment, AiOutlineSave, AiFillSave } from "react-icons/ai";
-
+import {
+  AiOutlineHeart,
+  AiFillHeart,
+  AiOutlineComment,
+  AiOutlineSave,
+  AiFillSave,
+} from "react-icons/ai";
 
 const IndividualBlog = () => {
   const { id } = useParams();
+  const [user, setUser] = useState(null);
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [likes, setLikes] = useState(0);
@@ -21,8 +27,8 @@ const IndividualBlog = () => {
       const response = await axios.get(`/users/verify`, {
         withCredentials: true, // Ensure cookies are sent with the request
       });
-      console.log("Authenticated User:", response.data);
-      return response.data.user;
+      setUser(response.data.user);
+      console.log("Line 25:", response.data.user);
     } catch (error) {
       console.error(
         "User not authenticated:",
@@ -178,13 +184,13 @@ const IndividualBlog = () => {
             <button
               onClick={() => handleLike(blog._id)}
               className={`p-2 rounded-full transition ${
-                blog.liked_by.includes("currentUserId") // Replace with actual user ID
+                blog.liked_by.some((likedUser) => likedUser._id === user._id) // Check if user ID exists in liked_by array
                   ? "bg-red-100 text-red-500"
                   : "bg-gray-200 text-gray-800"
               } hover:bg-red-200`}
               title="Like"
             >
-              {blog.liked_by.includes("currentUserId") ? (
+              {blog.liked_by.some((likedUser) => likedUser._id === user._id) ? (
                 <AiFillHeart size={24} />
               ) : (
                 <AiOutlineHeart size={24} />

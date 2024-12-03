@@ -8,7 +8,7 @@ const Itinerary = require("../models/Iternary");
 const IternaryDay = require("../models/IternaryDay");
 const OpenAI = require("openai");
 
-
+//Admin Login
 const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -32,6 +32,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
   }
 });
 
+//Create a Blog
 const CreateBlog = asyncHandler(async (req, res) => {
   const { title, description, content, adminId } = req.body;
   const file = req.files.image;
@@ -69,34 +70,38 @@ const CreateBlog = asyncHandler(async (req, res) => {
 // Get all blogs with selected fields
 const getBlogs = asyncHandler(async (req, res) => {
   try {
-    const getallposts = await Blogs.find().select("title description post_image");
+    const getallposts = await Blogs.find().select(
+      "title description post_image"
+    );
     res.status(200).json(getallposts);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch blogs", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch blogs", error: error.message });
   }
 });
 
+//Get One individual blog in single page
 const getSingleBlog = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   try {
     const singleBlog = await Blogs.findById(id)
-    .populate("adminId", "name email") // Populate adminId with name and email
-    .populate("liked_by", "user_name email image") // Populate liked_by with user details
-    .populate({
-      path: "comments",
-      populate: [
-        {
-          path: "user_id", // Assuming comments have a user_id field
-          select: "user_name email image", // Include only name, email, and image from User model
-        },
-        {
-          path: "admin_id", // Assuming comments have an admin_id field for admin replies
-          select: "admin_name email image", // Include only name and email from Admin model
-        },
-      ],
-    });
-  
+      .populate("adminId", "name email") // Populate adminId with name and email
+      .populate("liked_by", "user_name email image") // Populate liked_by with user details
+      .populate({
+        path: "comments",
+        populate: [
+          {
+            path: "user_id", // Assuming comments have a user_id field
+            select: "user_name email image", // Include only name, email, and image from User model
+          },
+          {
+            path: "admin_id", // Assuming comments have an admin_id field for admin replies
+            select: "admin_name email image", // Include only name and email from Admin model
+          },
+        ],
+      });
 
     if (!singleBlog) {
       res.status(404).json({ message: "Blog not found" });
@@ -105,11 +110,13 @@ const getSingleBlog = asyncHandler(async (req, res) => {
 
     res.status(200).json(singleBlog);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch the blog", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch the blog", error: error.message });
   }
 });
 
-
+//This Creates a Iternary
 const createIternary = asyncHandler(async (req, res) => {
   const { destination, totalDays, totalNights, adminId } = req.body;
   const file = req.files.photos;
@@ -143,6 +150,7 @@ const createIternary = asyncHandler(async (req, res) => {
   }
 });
 
+//This adds a Day to Iternary
 const addItineraryDay = asyncHandler(async (req, res) => {
   try {
     console.log("Request Body:", req.body);
@@ -243,6 +251,7 @@ const addItineraryDay = asyncHandler(async (req, res) => {
   }
 });
 
+//This is to fetch iternaries
 const ViewIternaries = asyncHandler(async (req, res) => {
   try {
     const itineraries = await Itinerary.find(); // Use `await` to resolve the promise
@@ -254,6 +263,7 @@ const ViewIternaries = asyncHandler(async (req, res) => {
   }
 });
 
+//This is to view single iternary in detail
 const ViewSingleIternary = asyncHandler(async (req, res) => {
   const { itineraryId } = req.params; // Extract itineraryId from the request parameters
   console.log("I came here", itineraryId);
@@ -290,10 +300,11 @@ const ViewSingleIternary = asyncHandler(async (req, res) => {
   }
 });
 
+//Admin Reply for Comments
 const addAdminReply = asyncHandler(async (req, res) => {
   const { id } = req.params; // Blog ID
   const { commentId, admin_id, reply } = req.body;
-  console.log(commentId, admin_id, reply)
+  console.log(commentId, admin_id, reply);
   try {
     // Find the specific blog and update the relevant comment
     const updatedBlog = await Blogs.findOneAndUpdate(
@@ -308,7 +319,8 @@ const addAdminReply = asyncHandler(async (req, res) => {
         },
       },
       { new: true } // Return the updated document
-    ).populate("comments.user_id", "user_name email image") // Populate user details in comments
+    )
+      .populate("comments.user_id", "user_name email image") // Populate user details in comments
       .populate("comments.admin_id", "admin_name email image"); // Populate admin details
 
     if (!updatedBlog) {
@@ -318,16 +330,18 @@ const addAdminReply = asyncHandler(async (req, res) => {
     res.status(200).json({ message: "Reply added successfully.", updatedBlog });
   } catch (error) {
     console.error("Error adding reply:", error);
-    res.status(500).json({ message: "Error adding reply.", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error adding reply.", error: error.message });
   }
 });
 
-//Toggle the like for Comment
-const togglecommentlike = asyncHandler(async(req,res) => {
+//Admin Toggle the like for Comment
+const togglecommentlike = asyncHandler(async (req, res) => {
   try {
     const { blogId, commentId } = req.params;
     const { admin_liked_comment } = req.body;
-    console.log( blogId, commentId, admin_liked_comment )
+    console.log(blogId, commentId, admin_liked_comment);
 
     // Find the blog and update the specific comment
     const updatedBlog = await Blogs.findOneAndUpdate(
@@ -349,10 +363,12 @@ const togglecommentlike = asyncHandler(async(req,res) => {
     console.error("Error toggling admin like:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-})
+});
+
+//AI Generated Travel Blog Content
 const generateTravelContent = asyncHandler(async (req, res) => {
   const { title } = req.body;
-  console.log(title)
+  console.log(title);
   if (!title) {
     return res.status(400).json({
       success: false,
@@ -393,7 +409,7 @@ const generateTravelContent = asyncHandler(async (req, res) => {
 
     // Parse JSON
     const structuredOutput = JSON.parse(generatedOutput);
-    console.log(structuredOutput)
+    console.log(structuredOutput);
     res.status(200).json({
       success: true,
       data: structuredOutput,
@@ -408,9 +424,10 @@ const generateTravelContent = asyncHandler(async (req, res) => {
   }
 });
 
+//AI Generated Activity Description of Content
 const generateActivityDescription = asyncHandler(async (req, res) => {
   const { activityName, itineraryId } = req.body;
-  console.log( activityName, itineraryId)
+  console.log(activityName, itineraryId);
   if (!activityName || !itineraryId) {
     return res.status(400).json({
       success: false,
@@ -478,6 +495,159 @@ const generateActivityDescription = asyncHandler(async (req, res) => {
   }
 });
 
+const ManageActivityDynamically = asyncHandler(async (req, res) => {
+  const { dayId, itineraryId } = req.params; // Extract the dayId and itineraryId from the URL params
+  const { name, description } = req.body; // Extract new activity details from request body
+  console.log(name, description, dayId, itineraryId);
+  const file = req.files?.image; // Safely access the uploaded file
+
+  // Check if all required fields are provided
+  if (!name || !description || !file) {
+    return res
+      .status(400)
+      .json({ message: "All activity fields are required." });
+  }
+  if (file.mimetype.startsWith("image/")) {
+    fileUrl = await uploadImageToS3(file);
+  }
+
+  try {
+    // Find the ItineraryDay by itineraryId and dayId
+    const itineraryDay = await IternaryDay.findOne({
+      _id: dayId,
+      itinerary: itineraryId,
+    });
+
+    // If no such ItineraryDay is found, return an error
+    if (!itineraryDay) {
+      return res.status(404).json({ message: "Itinerary Day not found." });
+    }
+
+    // Create the new activity object
+    const newActivity = {
+      name,
+      description,
+      image: fileUrl,
+    };
+
+    // Push the new activity into the day's activities array
+    itineraryDay.activities.push(newActivity);
+
+    // Save the updated ItineraryDay
+    await itineraryDay.save();
+
+    // Return the updated ItineraryDay with the new activity
+    res.status(200).json({
+      message: "Activity added successfully!",
+      itineraryDay,
+    });
+  } catch (error) {
+    console.error("Error adding activity:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+//Add an Day Dynamically
+const ManageDayDynamically = asyncHandler(async (req, res) => {
+  const { id } = req.params; // Extract the itineraryId from URL params
+  const { dayNumber } = req.body; // Get the dayNumber from the request body
+
+  // Validate the input
+  if (!dayNumber) {
+    return res.status(400).json({ message: "Day number is required." });
+  }
+
+  try {
+    // Verify if the itinerary exists
+    const itinerary = await Itinerary.findById(id);
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found." });
+    }
+
+    // Check if the dayNumber already exists for the itinerary
+    const existingDay = await IternaryDay.findOne({
+      itinerary: id,
+      dayNumber,
+    });
+    if (existingDay) {
+      return res
+        .status(400)
+        .json({ message: "Day already exists in itinerary." });
+    }
+
+    // Create a new day
+    const newDay = new IternaryDay({
+      itinerary: id,
+      dayNumber: `Day ${dayNumber}`,
+      activities: [], // Initialize with no activities
+    });
+
+    // Save the new day
+    await newDay.save();
+
+    // Return the newly created day
+    res.status(201).json({
+      message: "Day added successfully!",
+      newDay,
+    });
+  } catch (error) {
+    console.error("Error adding day:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+const DeleteDay = asyncHandler(async (req, res) => {
+  const { dayId } = req.params;
+
+  try {
+    // Find and delete the day by its ID
+    const deletedDay = await IternaryDay.findByIdAndDelete(dayId);
+
+    // If the day doesn't exist, return a 404 error
+    if (!deletedDay) {
+      return res.status(404).json({ message: "Day not found." });
+    }
+
+    res.status(200).json({
+      message: "Day deleted successfully!",
+      deletedDay, // Return the deleted day for confirmation (optional)
+    });
+  } catch (error) {
+    console.error("Error deleting day:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+const DeleteActivity = asyncHandler(async (req, res) => {
+  const { dayId, activityId } = req.params;
+
+  try {
+    // Find the day by its ID
+    const day = await IternaryDay.findById(dayId);
+
+    // If the day doesn't exist, return a 404 error
+    if (!day) {
+      return res.status(404).json({ message: "Day not found." });
+    }
+
+    // Filter out the activity to be deleted
+    const updatedActivities = day.activities.filter(
+      (activity) => activity._id.toString() !== activityId
+    );
+
+    // Update the day's activities and save
+    day.activities = updatedActivities;
+    await day.save();
+
+    res.status(200).json({
+      message: "Activity deleted successfully!",
+      updatedDay: day, // Return the updated day for confirmation (optional)
+    });
+  } catch (error) {
+    console.error("Error deleting activity:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
 
 //Function to generate tokens
 const generateToken = async (id) => {
@@ -498,5 +668,9 @@ module.exports = {
   addAdminReply,
   togglecommentlike,
   generateTravelContent,
-  generateActivityDescription
+  generateActivityDescription,
+  ManageActivityDynamically,
+  ManageDayDynamically,
+  DeleteDay,
+  DeleteActivity
 };

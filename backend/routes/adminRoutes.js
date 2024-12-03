@@ -12,6 +12,10 @@ const {
   togglecommentlike,
   generateTravelContent,
   generateActivityDescription,
+  ManageActivityDynamically,
+  ManageDayDynamically,
+  DeleteDay,
+  DeleteActivity,
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -28,4 +32,11 @@ router.route("/addadminreply/:id").post(addAdminReply);
 router.route("/togglecommentlike/:blogId/:commentId").put(togglecommentlike);
 router.route("/generateContent").post(generateTravelContent);
 router.route("/generateActivityDescription").post(generateActivityDescription);
+router.route("/addday/:id").post(ManageDayDynamically);
+router
+  .route("/addactivity/:itineraryId/:dayId")
+  .post(ManageActivityDynamically);
+router.route("/deleteDay/:dayId").delete(DeleteDay);
+router.route("/deleteActivity/:dayId/:activityId").delete(DeleteActivity);
+
 module.exports = router;
