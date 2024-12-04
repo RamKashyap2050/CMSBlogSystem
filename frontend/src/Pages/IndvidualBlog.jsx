@@ -29,6 +29,7 @@ const IndividualBlog = () => {
       });
       setUser(response.data.user);
       console.log("Line 25:", response.data.user);
+      return response.data.user; // Explicitly return the user
     } catch (error) {
       console.error(
         "User not authenticated:",
@@ -64,6 +65,27 @@ const IndividualBlog = () => {
 
     fetchBlog();
   }, [id]);
+  useEffect(() => {
+    const verifySave = async () => {
+      try {
+        const user = await fetchAuthenticatedUser(); // Get user data via /verify
+        if (!user) {
+          console.error("User not authenticated");
+          return;
+        }
+  
+        const response = await axios.get(`/users/verifysave`, {
+          params: { user_id: user._id, post_id: id },
+        });
+        console.log(response.data.saved);
+        setSaved(response.data.saved); // Set the saved state based on the response
+      } catch (error) {
+        console.error("Error verifying save status:", error);
+      }
+    };
+
+    verifySave();
+  }, [id]); // Dependency on blog ID
 
   const handleLike = async (id) => {
     try {
@@ -91,8 +113,22 @@ const IndividualBlog = () => {
     }
   };
 
-  const handleSave = () => {
-    setSaved((prevSaved) => !prevSaved);
+  const handleSave = async (id) => {
+    try {
+      // Toggle saved state locally for instant feedback
+      setSaved((prevSaved) => !prevSaved);
+      console.log(user._id, id);
+      const response = await axios.post(`/users/saveblogs/${id}`, {
+        saving_user_id: user._id, // User ID in the request body
+        post_id: id, // Blog ID
+      });
+
+      console.log(response.data.message); // Log success or toggle feedback
+    } catch (error) {
+      console.error("Error saving post:", error);
+      // Revert the saved state in case of error
+      setSaved((prevSaved) => !prevSaved);
+    }
   };
 
   const handleAddComment = async () => {
@@ -120,8 +156,6 @@ const IndividualBlog = () => {
       console.error("Error adding comment:", error);
     }
   };
-
-  console.log(blog);
 
   if (loading) {
     return <div className="text-center text-gray-500">Loading blog...</div>;
@@ -199,7 +233,7 @@ const IndividualBlog = () => {
 
             {/* Save Button */}
             <button
-              onClick={handleSave}
+              onClick={() => handleSave(blog._id)}
               className={`p-2 rounded-full transition ${
                 saved
                   ? "bg-green-100 text-green-500"
@@ -207,6 +241,7 @@ const IndividualBlog = () => {
               } hover:bg-green-200`}
               title="Save"
             >
+              {console.log(saved)}
               {saved ? <AiFillSave size={24} /> : <AiOutlineSave size={24} />}
             </button>
 

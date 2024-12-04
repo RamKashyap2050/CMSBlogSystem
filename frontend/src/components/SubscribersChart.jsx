@@ -22,11 +22,11 @@ const SubscribersChart = ({ data }) => {
       .append("g")
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    // Create the color scale
+    // Create the color scale with minimalist tones
     const color = d3
       .scaleOrdinal()
       .domain(["Subscribers", "Non-Subscribers"])
-      .range(["#4CAF50", "#F44336"]);
+      .range(["#A0AEC0", "#718096"]); // Softer gray and slate tones
 
     // Calculate the pie angles
     const pie = d3.pie().value((d) => d.value);
@@ -50,7 +50,7 @@ const SubscribersChart = ({ data }) => {
       .join("path")
       .attr("d", arc)
       .attr("fill", (d) => color(d.data.label))
-      .attr("stroke", "#fff")
+      .attr("stroke", "#E2E8F0") // Light stroke for better contrast
       .attr("stroke-width", 2);
 
     // Add text labels
@@ -63,7 +63,7 @@ const SubscribersChart = ({ data }) => {
       .attr("dy", "0.35em")
       .text((d) => `${d.data.label}: ${d.data.value}`)
       .style("font-size", "12px")
-      .style("fill", "#fff");
+      .style("fill", "#2D3748"); // Darker text for readability
   }, [data]);
 
   return <div ref={chartRef}></div>;

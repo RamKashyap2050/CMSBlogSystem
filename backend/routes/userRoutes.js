@@ -7,6 +7,8 @@ const {
   makeComment,
   toggleLike,
   sendEmail,
+  SavePost,
+  VerifySave,
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -26,5 +28,6 @@ router.route("/logout").post(logout);
 router.route("/blogs/comment/:id").post(makeComment);
 router.route("/blogs/like/:id").post(toggleLike);
 router.route("/contact").post(sendEmail);
-
+router.route("/saveblogs/:id").post(SavePost);
+router.route("/verifysave").get(VerifySave);
 module.exports = router;

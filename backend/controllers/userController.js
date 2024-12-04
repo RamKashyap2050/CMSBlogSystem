@@ -5,7 +5,9 @@ const nodemailer = require("nodemailer");
 const expressAsyncHandler = require("express-async-handler");
 const passport = require("passport");
 const Blogs = require("../models/Blogs");
-const Email = require("../models/Emails")
+const Email = require("../models/Emails");
+const Save = require("../models/Save");
+
 const signup = expressAsyncHandler(async (req, res) => {
   try {
     const { email, password, profilePhoto, name } = req.body;
@@ -159,13 +161,12 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
   const { user_name, email, message } = req.body; // Extract user details from request body
 
   try {
-
-        // Save email details to the database
-        const savedEmail = await Email.create({
-          user_name,
-          email,
-          message,
-        });
+    // Save email details to the database
+    const savedEmail = await Email.create({
+      user_name,
+      email,
+      message,
+    });
     // Setup transporter for nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -294,14 +295,69 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
     const info = await transporter.sendMail(mailOptions);
     console.log("Email sent: " + info.response);
 
-    res
-      .status(200)
-      .json({ message: "Acknowledgment email sent successfully.", email: savedEmail });
+    res.status(200).json({
+      message: "Acknowledgment email sent successfully.",
+      email: savedEmail,
+    });
   } catch (error) {
     console.error("Error sending email:", error);
     res
       .status(500)
       .json({ message: "Failed to send email.", error: error.message });
+  }
+});
+
+const SavePost = expressAsyncHandler(async (req, res) => {
+  const { saving_user_id, post_id } = req.body; // Extract user ID and blog ID from the request body
+  console.log(saving_user_id, post_id);
+  if (!saving_user_id || !post_id) {
+    return res
+      .status(400)
+      .json({ message: "User ID and Post ID are required." });
+  }
+
+  try {
+    // Check if the post is already saved by the user
+    const existingSave = await Save.findOne({
+      userId: saving_user_id,
+      blogId: post_id,
+    });
+    if (existingSave) {
+      // If already saved, toggle to unsave by removing it
+      await existingSave.remove();
+      return res.status(200).json({ message: "Post unsaved successfully." });
+    }
+
+    // Otherwise, save the post
+    const savePost = await Save.create({
+      userId: saving_user_id,
+      blogId: post_id,
+    });
+    res.status(201).json({ message: "Post saved successfully.", savePost });
+  } catch (error) {
+    console.error("Error saving post:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to save the post.", error: error.message });
+  }
+});
+
+const VerifySave = expressAsyncHandler(async (req, res) => {
+  const { user_id, post_id } = req.query; // Extract user ID and blog ID from query parameters
+  console.log(user_id, post_id )
+  if (!user_id || !post_id) {
+    return res
+      .status(400)
+      .json({ message: "User ID and Post ID are required." });
+  }
+
+  try {
+    // Check if the save record exists
+    const isSaved = await Save.findOne({ userId: user_id, blogId: post_id });
+    res.status(200).json({ saved: !!isSaved }); // Return true if saved, false otherwise
+  } catch (error) {
+    console.error("Error verifying save:", error);
+    res.status(500).json({ message: "Failed to verify save status." });
   }
 });
 
@@ -313,4 +369,6 @@ module.exports = {
   makeComment,
   toggleLike,
   sendEmail,
+  SavePost,
+  VerifySave,
 };

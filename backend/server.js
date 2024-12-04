@@ -43,7 +43,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true,
+      secure: false,
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000, // Cookie expiration (30 days)
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
