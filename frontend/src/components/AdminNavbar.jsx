@@ -1,8 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FaBars, FaTimes, FaBlog, FaMap, FaSignOutAlt } from "react-icons/fa";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // Check if admin is logged in by checking localStorage
@@ -17,9 +19,9 @@ const AdminNavbar = () => {
     <header className="bg-gray-800 text-white shadow-md">
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
         {/* Logo Section */}
-        <div className="text-2xl font-bold">
+        <div className="text-2xl font-bold flex items-center">
           <Link
-            to="/admin"
+            to="/admindashboard"
             className="hover:text-gray-300 flex items-center space-x-2"
           >
             <span>Admin Panel</span>
@@ -27,95 +29,73 @@ const AdminNavbar = () => {
         </div>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex space-x-6">
+        <nav className="hidden md:flex space-x-6 items-center">
           <Link
             to="/admincreateblog"
-            className="text-gray-300 hover:text-yellow-400 transition"
+            className="text-gray-300 hover:text-yellow-400 transition flex items-center space-x-2"
           >
-            Create Content
-          </Link>
-          <Link
-            to="/adminmanageblogs"
-            className="text-gray-300 hover:text-yellow-400 transition"
-          >
-            Manage Content
+            <FaBlog />
+            <span>Create Blog</span>
           </Link>
           <Link
             to="/admincreateiternary"
-            className="text-gray-300 hover:text-yellow-400 transition"
+            className="text-gray-300 hover:text-yellow-400 transition flex items-center space-x-2"
           >
-            Create Itinerary
-          </Link>
-          <Link
-            to="/adminmanageitineraries"
-            className="text-gray-300 hover:text-yellow-400 transition"
-          >
-            Manage Itineraries
+            <FaMap />
+            <span>Create Itinerary</span>
           </Link>
           <button
             onClick={() => {
               localStorage.removeItem("Admin"); // Remove admin data
               navigate("/loginadmin"); // Redirect to admin login
             }}
-            className="bg-red-500 px-4 py-2 rounded text-white hover:bg-red-600 transition"
+            className="bg-red-500 px-4 py-2 rounded text-white hover:bg-red-600 transition flex items-center space-x-2"
           >
-            Logout
+            <FaSignOutAlt />
+            <span>Logout</span>
           </button>
         </nav>
 
         {/* Hamburger Menu for Mobile */}
-        <div className="md:hidden relative group">
-          <button className="text-yellow-400 focus:outline-none">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-yellow-400 focus:outline-none"
+          >
+            {isMenuOpen ? (
+              <FaTimes className="h-6 w-6" />
+            ) : (
+              <FaBars className="h-6 w-6" />
+            )}
           </button>
-          <div className="absolute right-0 top-8 bg-gray-900 text-white rounded-lg shadow-lg hidden group-focus-within:block w-48">
-            <Link
-              to="/admincreateblog"
-              className="block px-4 py-2 hover:bg-gray-700 text-right"
-            >
-              Create Blog
-            </Link>
-            <Link
-              to="/adminmanageblogs"
-              className="block px-4 py-2 hover:bg-gray-700 text-right"
-            >
-              Manage Blogs
-            </Link>
-            <Link
-              to="/admincreateiternary"
-              className="block px-4 py-2 hover:bg-gray-700 text-right"
-            >
-              Create Itinerary
-            </Link>
-            <Link
-              to="/adminmanageitineraries"
-              className="block px-4 py-2 hover:bg-gray-700 text-right"
-            >
-              Manage Itineraries
-            </Link>
-            <button
-              onClick={() => {
-                localStorage.removeItem("Admin"); // Remove admin data
-                navigate("/loginadmin"); // Redirect to admin login
-              }}
-              className="block w-full text-left px-4 py-2 bg-red-500 text-white hover:bg-red-600 transition rounded-b-lg"
-            >
-              Logout
-            </button>
-          </div>
+          {isMenuOpen && (
+            <div className="absolute right-0 top-12 bg-gray-900 text-white rounded-lg shadow-lg w-48 z-50">
+              <Link
+                to="/admincreateblog"
+                className="block px-4 py-2 hover:bg-gray-700 text-right flex items-center space-x-2"
+              >
+                <FaBlog />
+                <span>Create Blog</span>
+              </Link>
+              <Link
+                to="/admincreateiternary"
+                className="block px-4 py-2 hover:bg-gray-700 text-right flex items-center space-x-2"
+              >
+                <FaMap />
+                <span>Create Itinerary</span>
+              </Link>
+              <button
+                onClick={() => {
+                  localStorage.removeItem("Admin"); // Remove admin data
+                  navigate("/loginadmin"); // Redirect to admin login
+                }}
+                className="block w-full text-left px-4 py-2 bg-red-500 text-white hover:bg-red-600 transition rounded-b-lg flex items-center space-x-2"
+              >
+                <FaSignOutAlt />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

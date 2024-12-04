@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FiMoreVertical, FiTrash2 } from "react-icons/fi";
+import { FaArrowRight } from "react-icons/fa";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
-
+import { Link } from "react-router-dom";
 const AdminViewItinerary = () => {
   const [itineraries, setItineraries] = useState([]);
   const [message, setMessage] = useState("");
@@ -83,7 +84,9 @@ const AdminViewItinerary = () => {
 
     try {
       await axios.delete(`/admin/api/deleteiternary/${id}`);
-      setItineraries((prev) => prev.filter((itinerary) => itinerary._id !== id));
+      setItineraries((prev) =>
+        prev.filter((itinerary) => itinerary._id !== id)
+      );
       setMessage("Itinerary deleted successfully!");
     } catch (error) {
       console.error("Error deleting itinerary:", error);
@@ -94,6 +97,15 @@ const AdminViewItinerary = () => {
   return (
     <div>
       <AdminNavbar />
+      <div className="flex justify-end p-4">
+        <Link
+          to="/admincreateiternary"
+          className="flex items-center font-bold text-lg text-black no-underline"
+        >
+          Create New Iternary
+          <FaArrowRight className="ml-2" /> {/* Arrow Icon */}
+        </Link>
+      </div>{" "}
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <h1 className="text-4xl font-bold text-center text-gray-800 my-6">
           View Itineraries

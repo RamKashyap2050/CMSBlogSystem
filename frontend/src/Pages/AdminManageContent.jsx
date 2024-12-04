@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa";
 
 const AdminManageContent = () => {
   const [blogs, setBlogs] = useState([]);
@@ -61,6 +63,15 @@ const AdminManageContent = () => {
   return (
     <>
       <AdminNavbar />
+      <div className="flex justify-end p-4">
+        <Link
+          to="/admincreateblog"
+          className="flex items-center font-bold text-lg text-black no-underline"
+        >
+          Create Blogs
+          <FaArrowRight className="ml-2" /> {/* Arrow Icon */}
+        </Link>
+      </div>{" "}
       <div className="min-h-screen bg-gray-50 p-6">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-10">
           Manage Content

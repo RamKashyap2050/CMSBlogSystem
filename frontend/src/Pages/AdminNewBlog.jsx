@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Footer from "../components/Footer";
 import AdminNavbar from "../components/AdminNavbar";
 import axios from "axios";
-import { FaMagic } from "react-icons/fa"; // Magic icon
-
+import { FaMagic, FaArrowRight } from "react-icons/fa"; // Magic icon
+import { Link } from "react-router-dom";
 const AdminNewBlog = () => {
   const [formData, setFormData] = useState({
     title: "",
@@ -108,6 +108,15 @@ const AdminNewBlog = () => {
   return (
     <>
       <AdminNavbar />
+      <div className="flex justify-end p-4">
+        <Link
+          to="/adminmanageblogs"
+          className="flex items-center font-bold text-lg text-black no-underline"
+        >
+          Manage Blogs
+          <FaArrowRight className="ml-2" /> {/* Arrow Icon */}
+        </Link>
+      </div>{" "}
       <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
         <div className="max-w-4xl w-full bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Footer from "../components/Footer";
 import AdminNavbar from "../components/AdminNavbar";
 import axios from "axios";
-import { FaMagic } from "react-icons/fa"; // Magic icon
-
+import { FaMagic, FaArrowRight } from "react-icons/fa"; // Magic icon
+import { Link } from "react-router-dom";
 const AdminNewItinerary = () => {
   const [formData, setFormData] = useState({
     destination: "",
@@ -209,6 +209,15 @@ const AdminNewItinerary = () => {
   return (
     <>
       <AdminNavbar />
+      <div className="flex justify-end p-4">
+        <Link
+          to="/adminmanageitineraries"
+          className="flex items-center font-bold text-lg text-black no-underline"
+        >
+          View Itiernaries
+          <FaArrowRight className="ml-2" /> {/* Arrow Icon */}
+        </Link>
+      </div>{" "}
       <div className="min-h-screen bg-gray-50 p-6">
         {step === 1 && (
           <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
