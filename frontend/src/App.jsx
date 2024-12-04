@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import BlogPage from "./Pages/BlogPage";
 import IndividualBlog from "./Pages/IndvidualBlog";
+import VlogPage from "./Pages/VlogPage";
 import logo from "./asitravel.jpg";
 import About from "./Pages/About";
 import Itinerary from "./Pages/Iternary";
@@ -17,6 +18,7 @@ import AdminNewIternary from "./Pages/AdminNewIternary";
 import AdminViewItinerary from "./Pages/AdminViewIternary";
 import AdminViewSingleIternary from "./Pages/AdminViewSingleIternary";
 import AdminViewSingleBlog from "./Pages/AdminViewSingleBlog";
+import IndividualVlog from "./Pages/IndividualVlog";
 
 const App = () => {
   return (
@@ -44,6 +46,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<BlogPage />} />
+        <Route path="/vlogspage" element={<VlogPage />} />
+        <Route path="/vlogs/:id" element={<IndividualVlog />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/about" element={<About />} />
         <Route path="/blog/:id" element={<IndividualBlog />} />

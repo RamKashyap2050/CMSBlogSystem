@@ -111,7 +111,7 @@ const AdminNewBlog = () => {
       <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
         <div className="max-w-4xl w-full bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-            Create New Blog
+            Create Content
           </h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Title with Magic Icon */}
@@ -120,7 +120,7 @@ const AdminNewBlog = () => {
                 htmlFor="title"
                 className="block text-gray-700 font-medium mb-2"
               >
-                Blog Title
+                Content Title
               </label>
               <div className="relative">
                 <input
@@ -151,21 +151,51 @@ const AdminNewBlog = () => {
             {/* Image Upload */}
             <div>
               <label
-                htmlFor="image"
+                htmlFor="media"
                 className="block text-gray-700 font-medium mb-2"
               >
-                Upload Image
+                Upload Image or Video
               </label>
               <input
                 type="file"
-                id="image"
-                name="image"
-                accept="image/*"
-                onChange={handleFileChange}
+                id="media"
+                name="media"
+                accept="image/*,video/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    console.log("File selected:", file); // Debugging
+                    setImage(file);
+                  } else {
+                    console.log("No file selected.");
+                  }
+                }}
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
+              {image && (
+                <div className="mt-4">
+                  {image.type.startsWith("image/") ? (
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt="Preview"
+                      className="w-full max-h-64 object-contain rounded-lg shadow-md"
+                    />
+                  ) : image.type.startsWith("video/") ? (
+                    <video
+                      controls
+                      src={URL.createObjectURL(image)}
+                      className="w-full max-h-64 object-contain rounded-lg shadow-md"
+                    />
+                  ) : (
+                    <p className="text-red-500">
+                      Unsupported file type for preview.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
+
             {/* Description */}
             <div>
               <label
@@ -191,7 +221,7 @@ const AdminNewBlog = () => {
                 htmlFor="content"
                 className="block text-gray-700 font-medium mb-2"
               >
-                Blog Content
+                Content
               </label>
               <textarea
                 id="content"

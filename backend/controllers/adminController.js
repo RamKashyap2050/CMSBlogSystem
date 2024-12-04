@@ -7,7 +7,7 @@ const { uploadImageToS3 } = require("../s3/s3");
 const Itinerary = require("../models/Iternary");
 const IternaryDay = require("../models/IternaryDay");
 const OpenAI = require("openai");
-
+const Vlogs = require("../models/Vlogs");
 //Admin Login
 const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -35,10 +35,11 @@ const loginAdmin = asyncHandler(async (req, res) => {
 //Create a Blog
 const CreateBlog = asyncHandler(async (req, res) => {
   const { title, description, content, adminId } = req.body;
-  const file = req.files.image;
+  const file = req.files.image; // Get the uploaded file
+  console.log(title, description, content, adminId, file);
 
   if (!title || !content || !file) {
-    return res.status(403).send({ message: "Please enter all fields" });
+    return res.status(403).json({ message: "Please enter all fields" });
   }
 
   let fileUrl = "";
@@ -52,19 +53,32 @@ const CreateBlog = asyncHandler(async (req, res) => {
     fileUrl = await uploadImageToS3(file);
     isVideo = true;
   } else {
-    return res.status(400).send({ message: "Unsupported file type" });
+    return res.status(400).json({ message: "Unsupported file type" });
   }
 
-  const blogs = await Blogs.create({
-    title,
-    content,
-    description,
-    post_image: isImage ? fileUrl : "",
-    VideoUrl: isVideo ? fileUrl : "",
-    adminId: adminId, // Set the "user" field to the authenticated user's ID
-  });
+  if (isImage) {
+    // Save to Blogs model
+    const blog = await Blogs.create({
+      title,
+      content,
+      description,
+      post_image: fileUrl,
+      adminId,
+    });
+    return res.status(200).json(blog);
+  }
 
-  res.status(200).json(blogs);
+  if (isVideo) {
+    // Save to Vlogs model
+    const vlog = await Vlogs.create({
+      title,
+      content,
+      description,
+      VideoUrl: fileUrl,
+      adminId,
+    });
+    return res.status(200).json(vlog);
+  }
 });
 
 // Get all blogs with selected fields
@@ -115,6 +129,54 @@ const getSingleBlog = asyncHandler(async (req, res) => {
       .json({ message: "Failed to fetch the blog", error: error.message });
   }
 });
+
+// Get all Vlogs with selected fields
+const getVlogs = asyncHandler(async (req, res) => {
+  try {
+    const getallposts = await Vlogs.find().select("title description VideoUrl");
+    res.status(200).json(getallposts);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch blogs", error: error.message });
+  }
+});
+
+//Get One individual vlog in single page
+const getSingleVlog = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  console.log(id)
+  try {
+    const singleVlog = await Vlogs.findById(id)
+      .populate("adminId", "name email") // Populate adminId with name and email
+      .populate("liked_by", "user_name email image") // Populate liked_by with user details
+      .populate({
+        path: "comments",
+        populate: [
+          {
+            path: "user_id", // Assuming comments have a user_id field
+            select: "user_name email image", // Include only name, email, and image from User model
+          },
+          {
+            path: "admin_id", // Assuming comments have an admin_id field for admin replies
+            select: "admin_name email image", // Include only name and email from Admin model
+          },
+        ],
+      });
+
+    if (!singleVlog) {
+      res.status(404).json({ message: "Blog not found" });
+      return;
+    }
+
+    res.status(200).json(singleVlog);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch the blog", error: error.message });
+  }
+});
+
 
 //This Creates a Iternary
 const createIternary = asyncHandler(async (req, res) => {
@@ -730,5 +792,7 @@ module.exports = {
   DeleteDay,
   DeleteActivity,
   updateItinerary,
-  DeleteIternary
+  DeleteIternary,
+  getVlogs,
+  getSingleVlog
 };

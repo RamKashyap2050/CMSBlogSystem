@@ -2,6 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import logo from "../asitravel.jpg";
+import { 
+  AiOutlineHome, 
+  AiOutlineVideoCamera, 
+  AiOutlineInfoCircle, 
+  AiOutlineBook, 
+  AiOutlineMail, 
+  AiOutlineUser 
+} from "react-icons/ai"; 
+import { FiLogOut } from "react-icons/fi";
 
 const Navbar = () => {
   const [user, setUser] = useState(null); // Store user data
@@ -46,30 +55,36 @@ const Navbar = () => {
           />
         </div>
         {/* Navigation */}
-        <nav className="flex space-x-4 items-center">
+        <nav className="flex space-x-6 items-center text-gray-600">
           <Link
             to="/"
-            className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
           >
-            Home
+            <AiOutlineHome size={20} />
+          </Link>
+          <Link
+            to="/vlogspage"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+          >
+            <AiOutlineVideoCamera size={20} />
           </Link>
           <Link
             to="/about"
-            className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
           >
-            About
+            <AiOutlineInfoCircle size={20} />
           </Link>
           <Link
             to="/iternary"
-            className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
           >
-            Itineraries
+            <AiOutlineBook size={20} />
           </Link>
           <Link
             to="/contact"
-            className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
           >
-            Contact
+            <AiOutlineMail size={20} />
           </Link>
           {/* User Menu */}
           {loading ? (
@@ -90,15 +105,17 @@ const Navbar = () => {
                 <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg">
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 space-x-2"
                   >
-                    Profile
+                    <AiOutlineUser size={18} />
+                    <span>Profile</span>
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 space-x-2"
                   >
-                    Logout
+                    <FiLogOut size={18} />
+                    <span>Logout</span>
                   </button>
                 </div>
               )}
@@ -106,9 +123,10 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+              className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
             >
-              Login/Signup
+              <AiOutlineUser size={20} />
+              <span>Login/Signup</span>
             </Link>
           )}
         </nav>

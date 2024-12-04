@@ -32,13 +32,13 @@ const AdminNavbar = () => {
             to="/admincreateblog"
             className="text-gray-300 hover:text-yellow-400 transition"
           >
-            Create Blog
+            Create Content
           </Link>
           <Link
             to="/adminmanageblogs"
             className="text-gray-300 hover:text-yellow-400 transition"
           >
-            Manage Blogs
+            Manage Content
           </Link>
           <Link
             to="/admincreateiternary"

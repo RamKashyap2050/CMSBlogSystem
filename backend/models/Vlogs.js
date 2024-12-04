@@ -3,10 +3,10 @@ const mongoose = require("mongoose");
 
 const vlogschema = mongoose.Schema(
   {
-    user: {
+    adminId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "Users",
+      ref: "Admin",
     },
     title: {
       type: String,
@@ -15,6 +15,10 @@ const vlogschema = mongoose.Schema(
     content: {
       type: String,
       required: [true, "Please enter Content"],
+    },
+    description: {
+      type: String,
+      required: [true, "Please enter a Description"],
     },
     VideoUrl: {
       type: String,
@@ -29,9 +33,27 @@ const vlogschema = mongoose.Schema(
       {
         user_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Users",
+          ref: "Users", // User who posted the comment
         },
-        comment: String,
+        comment: {
+          type: String,
+          required: true, // Comment content
+        },
+        created_at: {
+          type: Date,
+          default: Date.now, // Timestamp for the comment
+        },
+        admin_reply: {
+          type: String,
+        },
+        admin_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Admin", // Admin reply to the comment
+        },
+        admin_liked_comment: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
     archieved: {

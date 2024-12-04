@@ -18,6 +18,8 @@ const {
   DeleteActivity,
   updateItinerary,
   DeleteIternary,
+  getVlogs,
+  getSingleVlog,
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -42,4 +44,7 @@ router.route("/deleteDay/:dayId").delete(DeleteDay);
 router.route("/deleteActivity/:dayId/:activityId").delete(DeleteActivity);
 router.route("/updateitinerary/:id").put(updateItinerary);
 router.route("/deleteiternary/:id").delete(DeleteIternary);
+router.route("/getvlogs").get(getVlogs);
+router.route("/getsinglevlog/:id").get(getSingleVlog);
+
 module.exports = router;
