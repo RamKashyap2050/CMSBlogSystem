@@ -13,7 +13,7 @@ const emailSchema = mongoose.Schema(
       type: String,
     },
     admin_reply: {
-      type: String, // URL for the post image
+      type: String, 
     },
   },
   { collection: "Emails", timestamps: true } // Enables createdAt and updatedAt fields

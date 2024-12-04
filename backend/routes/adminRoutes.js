@@ -20,6 +20,10 @@ const {
   DeleteIternary,
   getVlogs,
   getSingleVlog,
+  getallUsers,
+  getTopInteractingUsers,
+  getallEmails,
+  sendEmailResponse
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -46,5 +50,8 @@ router.route("/updateitinerary/:id").put(updateItinerary);
 router.route("/deleteiternary/:id").delete(DeleteIternary);
 router.route("/getvlogs").get(getVlogs);
 router.route("/getsinglevlog/:id").get(getSingleVlog);
-
+router.route("/users").get(getallUsers);
+router.route("/interactions").get(getTopInteractingUsers);
+router.route("/emails").get(getallEmails)
+router.route("/sendemailresponse/:id").post(sendEmailResponse)
 module.exports = router;

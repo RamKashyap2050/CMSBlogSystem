@@ -5,7 +5,7 @@ const nodemailer = require("nodemailer");
 const expressAsyncHandler = require("express-async-handler");
 const passport = require("passport");
 const Blogs = require("../models/Blogs");
-
+const Email = require("../models/Emails")
 const signup = expressAsyncHandler(async (req, res) => {
   try {
     const { email, password, profilePhoto, name } = req.body;
@@ -159,6 +159,13 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
   const { user_name, email, message } = req.body; // Extract user details from request body
 
   try {
+
+        // Save email details to the database
+        const savedEmail = await Email.create({
+          user_name,
+          email,
+          message,
+        });
     // Setup transporter for nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -287,10 +294,9 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
     const info = await transporter.sendMail(mailOptions);
     console.log("Email sent: " + info.response);
 
-    // Respond to the client
     res
       .status(200)
-      .json({ message: "Acknowledgment email sent successfully." });
+      .json({ message: "Acknowledgment email sent successfully.", email: savedEmail });
   } catch (error) {
     console.error("Error sending email:", error);
     res

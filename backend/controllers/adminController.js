@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Admin = require("../models/Admin");
+const Users = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Blogs = require("../models/Blogs");
@@ -8,6 +9,9 @@ const Itinerary = require("../models/Iternary");
 const IternaryDay = require("../models/IternaryDay");
 const OpenAI = require("openai");
 const Vlogs = require("../models/Vlogs");
+const Emails = require("../models/Emails");
+const nodemailer = require("nodemailer");
+
 //Admin Login
 const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -145,7 +149,7 @@ const getVlogs = asyncHandler(async (req, res) => {
 //Get One individual vlog in single page
 const getSingleVlog = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(id)
+  console.log(id);
   try {
     const singleVlog = await Vlogs.findById(id)
       .populate("adminId", "name email") // Populate adminId with name and email
@@ -176,7 +180,6 @@ const getSingleVlog = asyncHandler(async (req, res) => {
       .json({ message: "Failed to fetch the blog", error: error.message });
   }
 });
-
 
 //This Creates a Iternary
 const createIternary = asyncHandler(async (req, res) => {
@@ -767,6 +770,236 @@ const DeleteIternary = asyncHandler(async (req, res) => {
   }
 });
 
+//Function that fetches all users for Admin
+const getallUsers = asyncHandler(async (req, res) => {
+  const getallUsers = await Users.find({});
+
+  res.status(200).json(getallUsers);
+});
+
+const getallEmails = asyncHandler(async (req, res) => {
+  const getallEmails = await Emails.find({});
+
+  res.status(200).json(getallEmails);
+});
+
+const getTopInteractingUsers = asyncHandler(async (req, res) => {
+  try {
+    const result = await Blogs.aggregate([
+      {
+        $project: {
+          // Combine liked_by and comments.user_id into a single array
+          interactions: {
+            $concatArrays: [
+              "$liked_by",
+              {
+                $map: {
+                  input: "$comments",
+                  as: "comment",
+                  in: "$$comment.user_id",
+                },
+              },
+            ],
+          },
+        },
+      },
+      { $unwind: "$interactions" }, // Flatten the interactions array
+      {
+        $group: {
+          _id: "$interactions", // Group by user ID
+          count: { $sum: 1 }, // Count occurrences
+        },
+      },
+      { $sort: { count: -1 } }, // Sort by count in descending order
+      { $limit: 10 }, // Get top 10 IDs
+    ]);
+
+    // Populate `user_name` for each user in the result
+    const populatedResults = await Promise.all(
+      result.map(async (entry) => {
+        const user = await Users.findById(entry._id, "user_name"); // Fetch only `user_name`
+        return {
+          ...entry,
+          user_name: user ? user.user_name : "Unknown User", // Add `user_name` field
+        };
+      })
+    );
+
+    res.status(200).json(populatedResults);
+  } catch (error) {
+    console.error("Error fetching top interacting users:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+const sendEmailResponse = asyncHandler(async (req, res) => {
+  const { id } = req.params; // Extract email ID from parameters
+  const { adminReply } = req.body; // Optional admin reply from the request body
+
+  try {
+    // Find the email document using the ID
+    const emailRecord = await Emails.findById(id);
+
+    if (!emailRecord) {
+      return res.status(404).json({ message: "Email record not found." });
+    }
+
+    const { user_name, email, message } = emailRecord;
+    emailRecord.admin_reply = adminReply;
+    await emailRecord.save();
+    // Set up the Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.NODE_MAILER_USER,
+        pass: process.env.NODE_MAILER_PASS,
+      },
+    });
+
+    // Mail options
+    const mailOptions = {
+      from: process.env.NODE_MAILER_USER,
+      to: email, // Recipient email
+      subject: "Thank You for Your Patience - AsITravel",
+      html: `
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f9f9f9;
+              color: #333333;
+              margin: 0;
+              padding: 0;
+            }
+            .email-container {
+              max-width: 600px;
+              margin: 20px auto;
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              padding: 20px;
+            }
+            .email-header {
+              text-align: center;
+              margin-bottom: 20px;
+              background-color: #e6f7ff; /* Light blue hue */
+              padding: 20px;
+              border-radius: 8px;
+            }
+            .email-header img {
+              max-width: 100px;
+              margin-bottom: 10px;
+              border-radius: 50%;
+            }
+            .email-body {
+              text-align: left;
+            }
+            .email-body h1 {
+              font-size: 20px;
+              color: #222222;
+              margin-bottom: 10px;
+            }
+            .email-body p {
+              font-size: 16px;
+              line-height: 1.6;
+              margin-bottom: 10px;
+            }
+            .email-footer {
+              text-align: center;
+              margin-top: 20px;
+              font-size: 14px;
+              color: #666666;
+            }
+            .email-footer a {
+              color: #333333;
+              text-decoration: none;
+            }
+            .button {
+              display: inline-block;
+              margin-top: 20px;
+              background-color: #e6f7ff; /* Light blue hue */
+              color: black;
+              padding: 10px 20px;
+              text-decoration: none;
+              border-radius: 5px;
+              font-size: 16px;
+              transition: background-color 0.3s ease, color 0.3s ease;
+            }
+            .button:hover {
+              background-color: #b3e0ff; /* Slightly deeper blue */
+              color: #000000; /* Keep text color consistent */
+            }
+            .highlight {
+              font-weight: bold;
+              color: #1a73e8;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="email-container">
+            <div class="email-header">
+              <img 
+                src="https://example-aws-bucket-trial-for-farmerplace.s3.us-east-2.amazonaws.com/AsITravel/asitravel.jpg" 
+                alt="AsITravel Logo"
+              />
+              <h2>AsITravel</h2>
+            </div>
+            <div class="email-body">
+              <h1>Hello, ${user_name}!</h1>
+              <p>
+                Thank you for your patience while I got back to you. Your message truly means a lot to me:
+              </p>
+              <blockquote style="font-style: italic; border-left: 3px solid #e6f7ff; padding-left: 10px; margin: 10px 0;">
+                "${message}"
+              </blockquote>
+              ${
+                adminReply
+                  ? `<p>Here is my response:</p>
+              <blockquote style="font-style: italic; border-left: 3px solid #1a73e8; padding-left: 10px; margin: 10px 0;">
+                "${adminReply}"
+              </blockquote>`
+                  : ""
+              }
+              <p>
+                If you'd like to discuss further, feel free to connect with me directly on Instagram:
+              </p>
+                <a href="https://www.instagram.com/asitravel.in/" target="_blank">Instagram</a>.
+              <p>
+                Alternatively, explore more travel stories and tips on my blog.
+              </p>
+              <a href="https://cms-blog-system.vercel.app/" class="button">Explore My Blog</a>
+              <p>Best wishes,</p>
+              <p>- Varsha Reddy</p>
+            </div>
+            <div class="email-footer">
+              <p>© ${new Date().getFullYear()} AsITravel. All rights reserved.</p>
+              <p>
+                Follow my adventures on 
+                <a href="https://www.instagram.com/asitravel.in/" target="_blank">Instagram</a>.
+              </p>
+            </div>
+          </div>
+        </body>
+      </html>
+      `,
+    };
+
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
+
+    // Respond to the client
+    res.status(200).json({
+      message: "Email response sent successfully.",
+    });
+  } catch (error) {
+    console.error("Error sending email response:", error);
+    res.status(500).json({ message: "Failed to send email response." });
+  }
+});
+
 //Function to generate tokens
 const generateToken = async (id) => {
   return await jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -794,5 +1027,9 @@ module.exports = {
   updateItinerary,
   DeleteIternary,
   getVlogs,
-  getSingleVlog
+  getSingleVlog,
+  getallUsers,
+  getTopInteractingUsers,
+  getallEmails,
+  sendEmailResponse
 };

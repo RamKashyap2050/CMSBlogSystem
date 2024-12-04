@@ -19,6 +19,7 @@ import AdminViewItinerary from "./Pages/AdminViewIternary";
 import AdminViewSingleIternary from "./Pages/AdminViewSingleIternary";
 import AdminViewSingleBlog from "./Pages/AdminViewSingleBlog";
 import IndividualVlog from "./Pages/IndividualVlog";
+import AdminDashboard from "./Pages/AdminDashboard";
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
       <Routes>
         {/* Admin Routes */}
         <Route path="/loginadmin" element={<LoginAdmin />} />
+        <Route path="/admindashboard" element={<AdminDashboard />}/>
         <Route path="/admincreateblog" element={<AdminNewBlog />} />
         <Route path="/adminmanageblogs" element={<AdminManageContent />} />
         <Route path="/admincreateiternary" element={<AdminNewIternary />} />
