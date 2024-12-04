@@ -53,8 +53,8 @@ const VlogPage = () => {
             autoPlay
             loop
             muted
-            playsInline
-            controls
+            playsInline // Prevent fullscreen on mobile
+            disablePictureInPicture // Optional: Prevent PiP mode
           ></video>
         ) : (
           <iframe
