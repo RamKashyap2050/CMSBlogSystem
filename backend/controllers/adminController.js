@@ -89,7 +89,7 @@ const CreateBlog = asyncHandler(async (req, res) => {
 const getBlogs = asyncHandler(async (req, res) => {
   try {
     const getallposts = await Blogs.find().select(
-      "title description post_image"
+      "title description post_image content archived"
     );
     res.status(200).json(getallposts);
   } catch (error) {
@@ -1000,6 +1000,94 @@ const sendEmailResponse = asyncHandler(async (req, res) => {
   }
 });
 
+
+const EditContent = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { title, content, description } = req.body;
+
+  try {
+    // Validate inputs
+    if (!title || !content || !description) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Log request for debugging
+    console.log("Request Payload:", { id, title, content, description });
+
+    // Find and update the blog content
+    const updatedContent = await Blogs.findByIdAndUpdate(
+      id,
+      {
+        title,
+        content,
+        description,
+        updatedAt: new Date(), // Update the timestamp
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedContent) {
+      return res.status(404).json({ message: "Content not found" });
+    }
+
+    // Respond with the updated document
+    res.status(200).json({
+      message: "Content updated successfully",
+      data: updatedContent,
+    });
+  } catch (error) {
+    console.error("Error updating content:", error);
+    res.status(500).json({ message: "Failed to update content", error });
+  }
+});
+
+
+
+const DeleteContent = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedContent = await Blogs.findByIdAndDelete(id);
+
+    if (!deletedContent) {
+      return res.status(404).json({ message: "Content not found" });
+    }
+
+    res.status(200).json({ message: "Content deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete content", error });
+  }
+});
+const ArchiveContent = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Fetch the current document
+    const blog = await Blogs.findById(id);
+    if (!blog) {
+      return res.status(404).json({ message: "Content not found" });
+    }
+
+    // Toggle the 'archived' field
+    const newArchivedValue = !blog.archived;
+
+    // Update the document with the toggled value
+    const updatedContent = await Blogs.findByIdAndUpdate(
+      id,
+      { archived: newArchivedValue, updatedAt: new Date() },
+      { new: true } // Return the updated document
+    );
+
+    res.status(200).json({
+      message: `Content ${newArchivedValue ? "archived" : "unarchived"} successfully`,
+      data: updatedContent,
+    });
+  } catch (error) {
+    console.error("Error toggling archive status:", error);
+    res.status(500).json({ message: "Failed to toggle archive status", error });
+  }
+});
+
 //Function to generate tokens
 const generateToken = async (id) => {
   return await jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -1031,5 +1119,8 @@ module.exports = {
   getallUsers,
   getTopInteractingUsers,
   getallEmails,
-  sendEmailResponse
+  sendEmailResponse,
+  EditContent,
+  DeleteContent,
+  ArchiveContent
 };

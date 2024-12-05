@@ -9,6 +9,7 @@ const {
   sendEmail,
   SavePost,
   VerifySave,
+  getBlogsforUserPage
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -30,4 +31,5 @@ router.route("/blogs/like/:id").post(toggleLike);
 router.route("/contact").post(sendEmail);
 router.route("/saveblogs/:id").post(SavePost);
 router.route("/verifysave").get(VerifySave);
+router.route("/getblogs").get(getBlogsforUserPage)
 module.exports = router;

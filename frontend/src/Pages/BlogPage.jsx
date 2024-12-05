@@ -11,7 +11,7 @@ const BlogPage = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await axios.get("/admin/api/getblogs");
+        const response = await axios.get("/users/getblogs");
         console.log(response.data);
         setBlogs(response.data); // Assuming the API returns an array of blogs
         setLoading(false);

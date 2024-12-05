@@ -344,7 +344,7 @@ const SavePost = expressAsyncHandler(async (req, res) => {
 
 const VerifySave = expressAsyncHandler(async (req, res) => {
   const { user_id, post_id } = req.query; // Extract user ID and blog ID from query parameters
-  console.log(user_id, post_id )
+  console.log(user_id, post_id);
   if (!user_id || !post_id) {
     return res
       .status(400)
@@ -360,6 +360,20 @@ const VerifySave = expressAsyncHandler(async (req, res) => {
     res.status(500).json({ message: "Failed to verify save status." });
   }
 });
+const getBlogsforUserPage = expressAsyncHandler(async (req, res) => {
+  try {
+    // Fetch all blogs where archived is false
+    const getallposts = await Blogs.find({ archived: false }).select(
+      "title description post_image content archived"
+    );
+
+    res.status(200).json(getallposts);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch blogs", error: error.message });
+  }
+});
 
 module.exports = {
   login,
@@ -371,4 +385,5 @@ module.exports = {
   sendEmail,
   SavePost,
   VerifySave,
+  getBlogsforUserPage,
 };

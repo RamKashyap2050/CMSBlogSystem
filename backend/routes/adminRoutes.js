@@ -23,7 +23,10 @@ const {
   getallUsers,
   getTopInteractingUsers,
   getallEmails,
-  sendEmailResponse
+  sendEmailResponse,
+  EditContent,
+  DeleteContent,
+  ArchiveContent
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -54,4 +57,8 @@ router.route("/users").get(getallUsers);
 router.route("/interactions").get(getTopInteractingUsers);
 router.route("/emails").get(getallEmails)
 router.route("/sendemailresponse/:id").post(sendEmailResponse)
+router.put("/edit/:id", EditContent);
+router.delete("/delete/:id", DeleteContent);
+router.put("/archive/:id", ArchiveContent);
+
 module.exports = router;
