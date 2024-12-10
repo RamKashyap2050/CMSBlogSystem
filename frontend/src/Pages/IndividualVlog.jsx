@@ -28,7 +28,10 @@ const IndividualVlog = () => {
       });
       setUser(response.data.user);
     } catch (error) {
-      console.error("User not authenticated:", error.response?.data || error.message);
+      console.error(
+        "User not authenticated:",
+        error.response?.data || error.message
+      );
     }
   };
 
@@ -90,7 +93,22 @@ const IndividualVlog = () => {
   };
 
   if (loading) {
-    return <div className="text-center text-gray-500">Loading vlog...</div>;
+    return (
+      <>
+        <Navbar />
+        <div class="loader-container">
+          <div class="loader">
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__ball"></div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
   if (!vlog) {
@@ -198,7 +216,8 @@ const IndividualVlog = () => {
                   <div key={comment._id} className="flex items-start space-x-4">
                     <img
                       src={
-                        comment.user_id.image || "https://via.placeholder.com/150"
+                        comment.user_id.image ||
+                        "https://via.placeholder.com/150"
                       }
                       alt={comment.user_id.user_name}
                       className="w-12 h-12 rounded-full border border-gray-300 shadow"

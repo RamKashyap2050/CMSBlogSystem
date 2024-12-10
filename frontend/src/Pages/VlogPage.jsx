@@ -27,9 +27,20 @@ const VlogPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading vlogs...
-      </div>
+      <>
+        <Navbar />
+        <div class="loader-container">
+          <div class="loader">
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__ball"></div>
+          </div>
+        </div>
+        <Footer />
+      </>
     );
   }
 

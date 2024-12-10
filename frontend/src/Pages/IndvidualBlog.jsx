@@ -21,6 +21,7 @@ const IndividualBlog = () => {
   const [saved, setSaved] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [userLiked, setUserLiked] = useState(false);
 
   const fetchAuthenticatedUser = async () => {
     try {
@@ -73,7 +74,7 @@ const IndividualBlog = () => {
           console.error("User not authenticated");
           return;
         }
-  
+
         const response = await axios.get(`/users/verifysave`, {
           params: { user_id: user._id, post_id: id },
         });
@@ -158,7 +159,22 @@ const IndividualBlog = () => {
   };
 
   if (loading) {
-    return <div className="text-center text-gray-500">Loading blog...</div>;
+    return (
+      <>
+        <Navbar />
+        <div class="loader-container">
+          <div class="loader">
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__ball"></div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
   if (!blog) {
@@ -213,18 +229,21 @@ const IndividualBlog = () => {
             </p>
           </div>
 
+          {/* Comments Section */}
           <div className="mt-6 flex items-center space-x-4">
             {/* Like Button */}
             <button
               onClick={() => handleLike(blog._id)}
               className={`p-2 rounded-full transition ${
-                blog.liked_by.some((likedUser) => likedUser._id === user._id) // Check if user ID exists in liked_by array
+                blog.liked_by?.some((likedUser) => likedUser?._id === user?._id)
                   ? "bg-red-100 text-red-500"
                   : "bg-gray-200 text-gray-800"
               } hover:bg-red-200`}
               title="Like"
             >
-              {blog.liked_by.some((likedUser) => likedUser._id === user._id) ? (
+              {blog.liked_by?.some(
+                (likedUser) => likedUser?._id === user?._id
+              ) ? (
                 <AiFillHeart size={24} />
               ) : (
                 <AiOutlineHeart size={24} />
@@ -258,10 +277,10 @@ const IndividualBlog = () => {
 
         {/* Comments Section */}
         <div
-          className={`transition-all duration-300 transform lg:w-[30%] ${
+          className={`transition-all duration-500 ease-in-out transform lg:w-[30%] ${
             isCommentsOpen
-              ? "w-full opacity-100 visible"
-              : "w-0 opacity-0 invisible"
+              ? "w-full opacity-100 visible translate-x-0"
+              : "w-0 opacity-0 invisible -translate-x-full"
           } bg-white shadow-lg`}
         >
           <div className="p-6">
