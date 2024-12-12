@@ -362,18 +362,29 @@ const VerifySave = expressAsyncHandler(async (req, res) => {
 });
 const getBlogsforUserPage = expressAsyncHandler(async (req, res) => {
   try {
-    // Fetch all blogs where archived is false
-    const getallposts = await Blogs.find({ archived: false }).select(
-      "title description post_image content archived"
-    );
+    const { page = 1, limit = 3 } = req.query; // Default to page 1 and limit 10
+    const skip = (page - 1) * limit;
 
-    res.status(200).json(getallposts);
+    // Fetch paginated blogs
+    const blogs = await Blogs.find({ archived: false })
+      .select("title description post_image content archived")
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalBlogs = await Blogs.countDocuments({ archived: false }); // Total number of blogs
+
+    res.status(200).json({
+      blogs,
+      totalBlogs,
+      hasMore: skip + blogs.length < totalBlogs, // Determine if more data exists
+    });
   } catch (error) {
     res
       .status(500)
       .json({ message: "Failed to fetch blogs", error: error.message });
   }
 });
+
 
 module.exports = {
   login,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -7,35 +7,67 @@ import axios from "axios";
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  // Fetch blogs based on the current page
+  const fetchBlogs = useCallback(async () => {
+    try {
+      setIsLoadingMore(true);
+      const response = await axios.get(`/users/getblogs?page=${page}&limit=3`);
+
+      setBlogs((prevBlogs) => {
+        const newBlogs = response.data.blogs.filter(
+          (newBlog) => !prevBlogs.some((blog) => blog._id === newBlog._id)
+        ); // Avoid duplicate entries
+        return [...prevBlogs, ...newBlogs];
+      });
+
+      setHasMore(response.data.hasMore); // Update if more blogs exist
+      setLoading(false);
+      setIsLoadingMore(false);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      setLoading(false);
+      setIsLoadingMore(false);
+    }
+  }, [page]);
+
+  // Initial fetch and on-page change
+  useEffect(() => {
+    fetchBlogs();
+  }, [fetchBlogs]);
+
+  // Infinite scrolling logic
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop + 1 >=
+      document.documentElement.scrollHeight
+    ) {
+      if (hasMore && !isLoadingMore) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const response = await axios.get("/users/getblogs");
-        console.log(response.data);
-        setBlogs(response.data); // Assuming the API returns an array of blogs
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching blogs:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchBlogs();
-  }, []);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasMore, isLoadingMore]);
 
   if (loading) {
     return (
       <>
         <Navbar />
-        <div class="loader-container">
-          <div class="loader">
-            <div class="loader__bar"></div>
-            <div class="loader__bar"></div>
-            <div class="loader__bar"></div>
-            <div class="loader__bar"></div>
-            <div class="loader__bar"></div>
-            <div class="loader__ball"></div>
+        <div className="loader-container">
+          <div className="loader">
+            <div className="loader__bar"></div>
+            <div className="loader__bar"></div>
+            <div className="loader__bar"></div>
+            <div className="loader__bar"></div>
+            <div className="loader__bar"></div>
+            <div className="loader__ball"></div>
           </div>
         </div>
         <Footer />
@@ -53,10 +85,7 @@ const BlogPage = () => {
             "url('https://images.unsplash.com/photo-1585986217770-f25e4fd55ed9?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8a2VkYXJrYW50aGF8ZW58MHx8MHx8fDA%3D')",
         }}
       >
-        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/30"></div>
-
-        {/* Content */}
         <div className="relative z-10 text-center max-w-2xl mx-auto">
           <h2 className="text-5xl font-extrabold text-white leading-tight">
             Your Next Adventure Awaits
@@ -66,8 +95,6 @@ const BlogPage = () => {
             and create unforgettable memories.
           </p>
         </div>
-
-        {/* Decorative Elements */}
         <div className="absolute bottom-4 left-4 flex items-center space-x-2">
           <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
           <div className="w-3 h-3 bg-white rounded-full animate-bounce delay-150"></div>
@@ -102,6 +129,23 @@ const BlogPage = () => {
             </div>
           ))}
         </div>
+        {isLoadingMore && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow animate-pulse"
+              >
+                <div className="w-full h-40 bg-gray-200"></div>
+                <div className="p-4">
+                  <div className="h-6 bg-gray-300 rounded-md mb-4"></div>
+                  <div className="h-4 bg-gray-300 rounded-md mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded-md w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </main>
       <Footer />
     </div>
