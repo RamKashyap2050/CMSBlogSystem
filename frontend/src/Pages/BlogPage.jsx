@@ -88,7 +88,7 @@ const BlogPage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/30"></div>
         <div className="relative z-10 text-center max-w-2xl mx-auto">
           <h2 className="text-5xl font-extrabold text-white leading-tight">
-            Your Next Adventure Awaits
+            As I Travel
           </h2>
           <p className="text-lg text-gray-200 mt-4">
             Embark on a journey of discovery. Explore breathtaking landscapes

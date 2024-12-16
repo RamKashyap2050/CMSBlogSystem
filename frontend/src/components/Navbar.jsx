@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import logo from "../asitravel.jpg";
-import { 
-  AiOutlineHome, 
-  AiOutlineVideoCamera, 
-  AiOutlineInfoCircle, 
-  AiOutlineBook, 
-  AiOutlineMail, 
-  AiOutlineUser 
-} from "react-icons/ai"; 
+import {
+  AiOutlineHome,
+  AiOutlineVideoCamera,
+  AiOutlineInfoCircle,
+  AiOutlineBook,
+  AiOutlineMail,
+  AiOutlineUser,
+  AiOutlineMenu
+} from "react-icons/ai";
 import { FiLogOut } from "react-icons/fi";
 
 const Navbar = () => {
@@ -55,7 +56,7 @@ const Navbar = () => {
           />
         </div>
         {/* Navigation */}
-        <nav className="flex space-x-6 items-center text-gray-600">
+        <nav className="hidden md:flex space-x-6 items-center text-gray-600">
           <Link
             to="/"
             className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
@@ -130,7 +131,81 @@ const Navbar = () => {
             </Link>
           )}
         </nav>
+        {/* Mobile Menu Button */}
+        <button
+          className="block md:hidden"
+          onClick={() => setDropdownOpen((prev) => !prev)}
+        >
+          <AiOutlineMenu size={24} />
+        </button>
       </div>
+
+      {/* Mobile Menu */}
+      {dropdownOpen && (
+        <div className="md:hidden flex flex-col space-y-2 px-4 pb-4">
+          <Link
+            to="/"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+          >
+            <AiOutlineHome size={20} />
+            <span>Home</span>
+          </Link>
+          <Link
+            to="/vlogspage"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+          >
+            <AiOutlineVideoCamera size={20} />
+            <span>Vlogs</span>
+          </Link>
+          <Link
+            to="/about"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+          >
+            <AiOutlineInfoCircle size={20} />
+            <span>About</span>
+          </Link>
+          <Link
+            to="/iternary"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+          >
+            <AiOutlineBook size={20} />
+            <span>Iternary</span>
+          </Link>
+          <Link
+            to="/contact"
+            className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+          >
+            <AiOutlineMail size={20} />
+            <span>Contact</span>
+          </Link>
+          {user ? (
+            <div className="flex flex-col space-y-2">
+              <Link
+                to="/profile"
+                className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+              >
+                <AiOutlineUser size={20} />
+                <span>Profile</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+              >
+                <FiLogOut size={20} />
+                <span>Logout</span>
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center space-x-2 hover:text-gray-800 text-sm font-medium"
+            >
+              <AiOutlineUser size={20} />
+              <span>Login/Signup</span>
+            </Link>
+          )}
+        </div>
+      )}
     </header>
   );
 };

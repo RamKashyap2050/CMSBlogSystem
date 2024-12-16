@@ -10,7 +10,7 @@ const Footer = () => {
           {/* Brand and Dedication */}
           <div className="text-center sm:text-left mb-6 sm:mb-0">
             <h1 className="text-xl font-bold text-blue-500">
-              Asitravel: Adventure Awaits
+              Asitravel: The World
             </h1>
             <p className="text-sm mt-2">
               Embark on a journey of discovery. Explore breathtaking landscapes

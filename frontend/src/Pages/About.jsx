@@ -64,16 +64,27 @@ const About = () => {
                 mountains, and immerse myself in different cultures. Born and
                 raised in India, my roots have instilled in me a profound love
                 for nature, travel, and discovery. These passions have guided my
-                life in every sense.
+                life and are the inspiration behind my website,{" "}
+                <strong>As I Travel</strong>.
               </p>
               <p className="text-gray-700 text-lg leading-relaxed mt-4">
-                I've been fortunate enough to travel to some incredible places,
-                from the serene beaches of Goa and the snowy peaks of
-                Kedarkantha in India to the picturesque streets of Paris and the
-                breathtaking Cape Breton in Canada. Travel, to me, is not just
-                about seeing new places; it's about embracing new experiences,
-                meeting new people, and finding moments that take my breath
-                away.
+                Through <strong>As I Travel</strong>, I share stories of my
+                adventures, from the serene beaches of Goa and the snowy peaks
+                of Kedarkantha in India to the picturesque streets of Paris and
+                the breathtaking Cape Breton in Canada. For me, travel is not
+                just about seeing new places; it's about embracing new
+                experiences, meeting amazing people, and creating moments that
+                take my breath away.{" "}
+                <strong>
+                  <a
+                    href="https://asitravel.in"
+                    className="text-blue-500 hover:underline"
+                  >
+                    asitravel.in
+                  </a>
+                </strong>{" "}
+                is a place where I connect with fellow wanderers and inspire
+                others to explore the world.
               </p>
             </div>
           </div>
@@ -190,15 +201,28 @@ const About = () => {
               Let's Explore Together!
             </h2>
             <p className="text-gray-700 text-lg leading-relaxed">
-              Whether it’s a trek up a snowy mountain or a stroll through a new
-              city, I believe there’s a world out there waiting to be
-              discovered. Join me in my journey of exploration, and let’s create
-              unforgettable memories together!
+              Whether it’s trekking up a snowy mountain, strolling through the
+              vibrant streets of a new city, or discovering hidden gems, I
+              believe there’s a world of adventures waiting to be explored.
+              Through <strong>As I Travel</strong>, I invite you to join me on
+              this exciting journey of exploration. Together, let’s uncover
+              breathtaking destinations and create unforgettable memories!
             </p>
             <p className="text-gray-700 text-lg leading-relaxed mt-4">
-              Feel free to reach out, share your favorite travel stories, or
-              simply say hi. Let’s inspire each other to keep exploring and
-              discovering the beauty of this world.
+              I’d love to hear from you! Feel free to share your favorite travel
+              stories, ask for tips, or simply say hi. Connect with me through{" "}
+              <strong>As I Travel</strong> and let’s inspire each other to keep
+              discovering the beauty of this incredible world. Visit{" "}
+              <strong>
+                <a
+                  href="https://asitravel.in"
+                  className="text-blue-500 hover:underline"
+                >
+                  asitravel.in
+                </a>
+              </strong>{" "}
+              to explore more travel tales, guides, and tips for your next
+              adventure.
             </p>
           </div>
         </div>

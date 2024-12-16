@@ -22,7 +22,9 @@ const Contact = () => {
     try {
       const response = await axios.post("/users/contact", formData); // Adjust API endpoint as per your backend
       if (response.status === 200) {
-        setSuccessMessage("Message sent successfully! I'll get back to you soon.");
+        setSuccessMessage(
+          "Message sent successfully! I'll get back to you soon."
+        );
         setFormData({ user_name: "", email: "", message: "" }); // Clear form after successful submission
       }
     } catch (error) {
@@ -136,8 +138,16 @@ const Contact = () => {
         {/* Footer Section */}
         <div className="mt-12 text-center text-gray-600">
           <p>
-            Thank you for visiting my world of travel and adventure. Let’s
-            connect and make your next journey unforgettable!
+            Thank you for visiting my world of travel and adventure on{" "}
+            <strong>
+              <a
+                href="https://asitravel.in"
+                className="text-blue-500 hover:underline"
+              >
+                asitravel.in
+              </a>
+            </strong>{" "}
+            . Let’s connect and make your next journey unforgettable!
           </p>
         </div>
       </div>
