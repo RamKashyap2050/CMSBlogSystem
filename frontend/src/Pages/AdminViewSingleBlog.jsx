@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
-import ImageWithDimensionCheck from "../components/ImageWithDimensionCheck"
+import ImageWithDimensionCheck from "../components/ImageWithDimensionCheck";
 import axios from "axios";
 
 const AdminViewSingleBlog = () => {
@@ -34,19 +34,29 @@ const AdminViewSingleBlog = () => {
     }));
   };
 
-  const handleAdminLikeCommentToggle = async (BlogId,commentId, currentLikeStatus) => {
+  const handleAdminLikeCommentToggle = async (
+    BlogId,
+    commentId,
+    currentLikeStatus
+  ) => {
     try {
       // Send PUT request to toggle like status
-      const response = await axios.put(`/admin/api/toggleCommentLike/${BlogId}/${commentId}`, {
-        admin_liked_comment: !currentLikeStatus,
-      });
-  
+      const response = await axios.put(
+        `/admin/api/toggleCommentLike/${BlogId}/${commentId}`,
+        {
+          admin_liked_comment: !currentLikeStatus,
+        }
+      );
+
       // Update the local state to reflect changes
       setBlog((prevBlog) => ({
         ...prevBlog,
         comments: prevBlog.comments.map((comment) =>
           comment._id === commentId
-            ? { ...comment, admin_liked_comment: response.data.admin_liked_comment }
+            ? {
+                ...comment,
+                admin_liked_comment: response.data.admin_liked_comment,
+              }
             : comment
         ),
       }));
@@ -54,7 +64,6 @@ const AdminViewSingleBlog = () => {
       console.error("Error toggling admin like:", error);
     }
   };
-  
 
   const handleReply = async (commentId) => {
     const reply = replyInputs[commentId]?.trim();
@@ -111,6 +120,31 @@ const AdminViewSingleBlog = () => {
     return <div className="text-center text-gray-500">Loading blog...</div>;
   }
 
+  // Function to parse content and render dynamically
+  const renderContent = (content) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to identify URLs
+
+    const parts = content.split(urlRegex); // Split content into text and URLs
+    return parts.map((part, index) =>
+      part.match(urlRegex) ? (
+        // Render image for URLs
+        <ImageWithDimensionCheck
+          key={index}
+          src={part}
+          alt={`Image ${index}`}
+        />
+      ) : (
+        // Render text for non-URLs
+        <p
+          key={index}
+          className="mt-4 mb-4 text-gray-700 text-lg leading-relaxed"
+        >
+          {part}
+        </p>
+      )
+    );
+  };
+
   if (!blog) {
     return <div className="text-center text-red-500">Blog not found!</div>;
   }
@@ -127,9 +161,7 @@ const AdminViewSingleBlog = () => {
           <div>
             <ImageWithDimensionCheck src={blog.post_image} alt={blog.title} />
           </div>
-          <div className="mt-6 text-gray-700 text-lg leading-relaxed">
-            {blog.content}
-          </div>
+          <div className="mt-6 mb-6">{renderContent(blog.content)}</div>
         </div>
 
         {/* Comments Section */}
@@ -159,7 +191,7 @@ const AdminViewSingleBlog = () => {
                         <button
                           onClick={() =>
                             handleAdminLikeCommentToggle(
-                                blog._id,
+                              blog._id,
                               comment._id,
                               comment.admin_liked_comment
                             )

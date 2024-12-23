@@ -67,32 +67,35 @@ const AdminNewBlog = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
-  
+
     try {
       const adminData = JSON.parse(localStorage.getItem("Admin"));
       if (!adminData || !adminData._id) {
         setMessage("Admin information is missing. Please log in again.");
         return;
       }
-  
+
       // Combine all text and URLs into a single string
       const finalContent = formData.contentSections
         .filter((section) => section.text || section.image) // Only include non-empty sections
-        .map((section) => `${section.text}${section.image ? ` ${section.image}` : ""}`) // Combine text and image URL
+        .map(
+          (section) =>
+            `${section.text}${section.image ? ` ${section.image}` : ""}`
+        ) // Combine text and image URL
         .join("\n"); // Use newline for better formatting
-  
+
       // Prepare formData object to send to the backend
       const formDataWithFile = new FormData();
       formDataWithFile.append("title", formData.title);
       formDataWithFile.append("description", formData.description);
       formDataWithFile.append("content", finalContent); // Combined content
       formDataWithFile.append("adminId", adminData._id);
-  
+
       // Include mainImage if it exists
       if (mainImage) {
         formDataWithFile.append("mainImage", mainImage); // Add the main image or video
       }
-  
+
       // Make the API request with the FormData object
       const response = await axios.post(
         "/admin/api/createblog",
@@ -101,7 +104,7 @@ const AdminNewBlog = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-  
+
       // Reset state on success
       setMessage("Blog created successfully!");
       setFormData({
@@ -115,39 +118,55 @@ const AdminNewBlog = () => {
       setMessage("Failed to create the blog. Please try again.");
     }
   };
-  
+
   const handleImageUpload = async (file, index) => {
     try {
-      console.log("Uploading file:", file);
-  
+      // Set loading to true for the section being updated
+      setFormData((prevFormData) => {
+        const updatedSections = [...prevFormData.contentSections];
+        updatedSections[index].loading = true;
+        return { ...prevFormData, contentSections: updatedSections };
+      });
+
       const formData = new FormData();
       formData.append("file", file);
-  
+
       const response = await axios.post("/admin/api/uploadImage", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
+
       const { url } = response.data;
-  
-      // Update the content section with the uploaded image URL
+
+      // Update the section with the uploaded image URL and set loading to false
       setFormData((prevFormData) => {
         const updatedSections = [...prevFormData.contentSections];
-        updatedSections[index].image = url; // Store the URL instead of the file
-  
+        updatedSections[index].image = url; // Store the URL
+        updatedSections[index].loading = false;
+        updatedSections[index].preview = URL.createObjectURL(file); // Temporary preview
+
         // Add a new empty section for future input
-        updatedSections.push({ text: "", image: null, preview: null });
-  
+        updatedSections.push({
+          text: "",
+          image: null,
+          preview: null,
+          loading: false,
+        });
+
         return { ...prevFormData, contentSections: updatedSections };
       });
-  
-      console.log("Image uploaded successfully, URL:", url);
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Failed to upload image. Please try again.");
+
+      // Reset loading to false in case of an error
+      setFormData((prevFormData) => {
+        const updatedSections = [...prevFormData.contentSections];
+        updatedSections[index].loading = false;
+        return { ...prevFormData, contentSections: updatedSections };
+      });
     }
   };
-  
-  
+
   return (
     <>
       <AdminNavbar />
@@ -248,6 +267,7 @@ const AdminNewBlog = () => {
             <div className="space-y-6">
               {formData.contentSections.map((section, index) => (
                 <div key={index} className="border p-4 rounded-lg space-y-4">
+                  {/* Textarea for description */}
                   <textarea
                     value={section.text}
                     onChange={(e) =>
@@ -257,24 +277,31 @@ const AdminNewBlog = () => {
                     placeholder="Enter description for this section"
                     rows="3"
                   />
+
+                  {/* File input for image upload */}
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
                       if (e.target.files[0]) {
-                        handleImageUpload(e.target.files[0], index); // Pass the file first, then the index
+                        handleImageUpload(e.target.files[0], index);
                       }
                     }}
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
 
-                  {section.preview && (
+                  {/* Conditional Preview or Loading Spinner */}
+                  {section.loading ? (
+                    <div className="flex items-center justify-center h-64">
+                      <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                    </div>
+                  ) : section.image ? (
                     <img
-                      src={section.preview}
+                      src={section.image} // Use URL from backend
                       alt={`Preview ${index}`}
                       className="w-full max-h-64 object-contain rounded-lg shadow-md mt-2"
                     />
-                  )}
+                  ) : null}
                 </div>
               ))}
             </div>
