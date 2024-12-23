@@ -26,7 +26,8 @@ const {
   sendEmailResponse,
   EditContent,
   DeleteContent,
-  ArchiveContent
+  ArchiveContent,
+  uploadSingleImageforDynamicUrls,
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -55,10 +56,11 @@ router.route("/getvlogs").get(getVlogs);
 router.route("/getsinglevlog/:id").get(getSingleVlog);
 router.route("/users").get(getallUsers);
 router.route("/interactions").get(getTopInteractingUsers);
-router.route("/emails").get(getallEmails)
-router.route("/sendemailresponse/:id").post(sendEmailResponse)
+router.route("/emails").get(getallEmails);
+router.route("/sendemailresponse/:id").post(sendEmailResponse);
 router.put("/edit/:id", EditContent);
 router.delete("/delete/:id", DeleteContent);
 router.put("/archive/:id", ArchiveContent);
+router.route("/uploadImage").post(uploadSingleImageforDynamicUrls);
 
 module.exports = router;

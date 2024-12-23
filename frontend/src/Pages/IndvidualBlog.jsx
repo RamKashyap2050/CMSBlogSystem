@@ -177,6 +177,31 @@ const IndividualBlog = () => {
     );
   }
 
+  // Function to parse content and render dynamically
+  const renderContent = (content) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to identify URLs
+
+    const parts = content.split(urlRegex); // Split content into text and URLs
+    return parts.map((part, index) =>
+      part.match(urlRegex) ? (
+        // Render image for URLs
+        <ImageWithDimensionCheck
+          key={index}
+          src={part}
+          alt={`Image ${index}`}
+        />
+      ) : (
+        // Render text for non-URLs
+        <p
+          key={index}
+          className="mt-4 mb-4 text-gray-700 text-lg leading-relaxed"
+        >
+          {part}
+        </p>
+      )
+    );
+  };
+
   if (!blog) {
     return <div className="text-center text-red-500">Blog not found!</div>;
   }
@@ -198,9 +223,8 @@ const IndividualBlog = () => {
             <ImageWithDimensionCheck src={blog.post_image} alt={blog.title} />
           </div>
 
-          <div className="mt-6 text-gray-700 text-lg leading-relaxed">
-            {blog.content}
-          </div>
+          <div className="mt-6 mb-6">{renderContent(blog.content)}</div>
+
           <div className="flex items-center space-x-2 mt-4">
             {/* Profile photos for users who liked the blog */}
             <div className="flex items-center -space-x-2">

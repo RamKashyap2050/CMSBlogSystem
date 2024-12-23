@@ -36,11 +36,10 @@ const loginAdmin = asyncHandler(async (req, res) => {
   }
 });
 
-//Create a Blog
 const CreateBlog = asyncHandler(async (req, res) => {
   const { title, description, content, adminId } = req.body;
-  const file = req.files.image; // Get the uploaded file
-  console.log(title, description, content, adminId, file);
+  const file = req.files.mainImage; // Get the uploaded file
+  console.log(content);
 
   if (!title || !content || !file) {
     return res.status(403).json({ message: "Please enter all fields" });
@@ -82,6 +81,22 @@ const CreateBlog = asyncHandler(async (req, res) => {
       adminId,
     });
     return res.status(200).json(vlog);
+  }
+});
+
+const uploadSingleImageforDynamicUrls = asyncHandler(async (req, res) => {
+  const file = req.files.file;
+
+  if (!file || !file.mimetype.startsWith("image/")) {
+    return res.status(400).json({ message: "Invalid image file" });
+  }
+
+  try {
+    const imageUrl = await uploadImageToS3(file); // Use your custom S3 upload function
+    return res.status(200).json({ url: imageUrl });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return res.status(500).json({ message: "Error uploading image" });
   }
 });
 
@@ -1000,7 +1015,6 @@ const sendEmailResponse = asyncHandler(async (req, res) => {
   }
 });
 
-
 const EditContent = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { title, content, description } = req.body;
@@ -1041,8 +1055,6 @@ const EditContent = asyncHandler(async (req, res) => {
   }
 });
 
-
-
 const DeleteContent = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -1079,7 +1091,9 @@ const ArchiveContent = asyncHandler(async (req, res) => {
     );
 
     res.status(200).json({
-      message: `Content ${newArchivedValue ? "archived" : "unarchived"} successfully`,
+      message: `Content ${
+        newArchivedValue ? "archived" : "unarchived"
+      } successfully`,
       data: updatedContent,
     });
   } catch (error) {
@@ -1122,5 +1136,6 @@ module.exports = {
   sendEmailResponse,
   EditContent,
   DeleteContent,
-  ArchiveContent
+  ArchiveContent,
+  uploadSingleImageforDynamicUrls,
 };
