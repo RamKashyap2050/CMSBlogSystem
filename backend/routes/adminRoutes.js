@@ -28,6 +28,7 @@ const {
   DeleteContent,
   ArchiveContent,
   uploadSingleImageforDynamicUrls,
+  sendnewsletter,
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -62,5 +63,5 @@ router.put("/edit/:id", EditContent);
 router.delete("/delete/:id", DeleteContent);
 router.put("/archive/:id", ArchiveContent);
 router.route("/uploadImage").post(uploadSingleImageforDynamicUrls);
-
+router.route("/sendnewsletter").post(sendnewsletter);
 module.exports = router;

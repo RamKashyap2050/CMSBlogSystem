@@ -44,6 +44,12 @@ const AdminNavbar = () => {
             <FaMap />
             <span>Create Itinerary</span>
           </Link>
+          <Link
+            to="/adminewsletter"
+            className="block px-4 py-2 hover:bg-gray-700 text-right flex items-center space-x-2"
+          >
+            <span>Send Newsletter</span>
+          </Link>
           <button
             onClick={() => {
               localStorage.removeItem("Admin"); // Remove admin data
@@ -83,6 +89,12 @@ const AdminNavbar = () => {
               >
                 <FaMap />
                 <span>Create Itinerary</span>
+              </Link>
+              <Link
+                to="/adminewsletter"
+                className="block px-4 py-2 hover:bg-gray-700 text-right flex items-center space-x-2"
+              >
+                <span>Send Newsletter</span>
               </Link>
               <button
                 onClick={() => {

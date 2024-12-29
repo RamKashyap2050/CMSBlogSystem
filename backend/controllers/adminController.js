@@ -86,7 +86,7 @@ const CreateBlog = asyncHandler(async (req, res) => {
 
 const uploadSingleImageforDynamicUrls = asyncHandler(async (req, res) => {
   const file = req.files.file;
-
+  console.log(file);
   if (!file || !file.mimetype.startsWith("image/")) {
     return res.status(400).json({ message: "Invalid image file" });
   }
@@ -1102,6 +1102,150 @@ const ArchiveContent = asyncHandler(async (req, res) => {
   }
 });
 
+// Nodemailer transporter configuration
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.NODE_MAILER_USER,
+    pass: process.env.NODE_MAILER_PASS,
+  },
+});
+
+// Function to parse and format the content
+const parseContent = (rawContent) => {
+  // Replace <strong> tags with inline styling for bold text
+  rawContent = rawContent.replace(/<strong>(.*?)<\/strong>/g, `<b>$1</b>`);
+
+  // Replace <em> tags with inline styling for italic text
+  rawContent = rawContent.replace(/<em>(.*?)<\/em>/g, `<i>$1</i>`);
+
+  // Properly replace image URLs (URL followed by the link) with <img> tags
+  // Replace URLs prefixed with 'URL' into standalone <img> tags
+  rawContent = rawContent.replace(
+    /URL(https?:\/\/[^\s<]+)(?=<|$)/g, // Match 'URL' followed by URL, ending at a '<' or the end of the string
+    `<img src="$1" alt="Image" style="max-width: 100%; height: auto; margin: 10px 0;" />`
+  );
+
+  // Ensure proper spacing and cleanup
+  return rawContent.trim();
+};
+
+// Function to send emails in batches
+const sendEmailsInBatches = async (subscribers, content, batchSize = 100) => {
+  const formattedContent = parseContent(content);
+  console.log(formattedContent);
+  for (let i = 0; i < subscribers.length; i += batchSize) {
+    const batch = subscribers.slice(i, i + batchSize);
+
+    const emailPromises = batch.map((subscriber) => {
+      const mailOptions = {
+        from: process.env.NODE_MAILER_USER,
+        to: subscriber.email,
+        subject: "Latest Newsletter from AsITravel",
+        html: `
+          <html>
+            <head>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  background-color: #f9f9f9;
+                  color: #333333;
+                  margin: 0;
+                  padding: 0;
+                }
+                .email-container {
+                  max-width: 600px;
+                  margin: 20px auto;
+                  background-color: #ffffff;
+                  border-radius: 8px;
+                  overflow: hidden;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                  padding: 20px;
+                }
+                .email-header {
+                  text-align: center;
+                  margin-bottom: 20px;
+                  background-color: #e6f7ff;
+                  padding: 20px;
+                  border-radius: 8px;
+                }
+                .email-header img {
+                  max-width: 100px;
+                  margin-bottom: 10px;
+                  border-radius: 50%;
+                }
+                .email-body {
+                  text-align: left;
+                }
+                .email-body p {
+                  font-size: 16px;
+                  line-height: 1.6;
+                  margin-bottom: 10px;
+                }
+                .email-footer {
+                  text-align: center;
+                  margin-top: 20px;
+                  font-size: 14px;
+                  color: #666666;
+                }
+                .email-footer a {
+                  color: #333333;
+                  text-decoration: none;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="email-container">
+                <div class="email-header">
+                  <img
+                    src="https://example-aws-bucket-trial-for-farmerplace.s3.us-east-2.amazonaws.com/AsITravel/asitravel.jpg"
+                    alt="AsITravel Logo"
+                  />
+                  <h2>AsITravel</h2>
+                </div>
+                <div class="email-body">
+                  ${formattedContent} <!-- Inject parsed content here -->
+                </div>
+                <div class="email-footer">
+                  <p>© ${new Date().getFullYear()} AsITravel. All rights reserved.</p>
+                  <p>
+                    Follow my adventures on
+                    <a href="https://www.instagram.com/asitravel.in/" target="_blank">Instagram</a>.
+                  </p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+      return transporter.sendMail(mailOptions);
+    });
+
+    try {
+      await Promise.all(emailPromises);
+      console.log(`Batch ${i / batchSize + 1} sent successfully.`);
+    } catch (error) {
+      console.error(`Error sending batch ${i / batchSize + 1}:`, error);
+    }
+  }
+};
+
+const sendnewsletter = asyncHandler(async (req, res) => {
+  const { content } = req.body; // Get content from the request body'
+  console.log("I am Raw Content from Frontend", content);
+  const subscribers = await Users.find({ IsSubscriber: true }); // Fetch all subscribers
+
+  if (!content || !subscribers.length) {
+    return res
+      .status(400)
+      .json({ message: "Content or subscribers are missing" });
+  }
+
+  await sendEmailsInBatches(subscribers, content); // Send emails in batches
+  res.status(200).json({ message: "Newsletter sent successfully!" });
+});
+
 //Function to generate tokens
 const generateToken = async (id) => {
   return await jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -1138,4 +1282,5 @@ module.exports = {
   DeleteContent,
   ArchiveContent,
   uploadSingleImageforDynamicUrls,
+  sendnewsletter,
 };
