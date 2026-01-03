@@ -2,7 +2,7 @@
   "name": "AsITravel",
   "version": "1.0.0",
   "engines": {
-    "node": "16.16.0"
+    "node": "22.21.1"
   },
   "description": "CMS app",
   "main": "server.js",
