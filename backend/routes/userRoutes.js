@@ -11,6 +11,8 @@ const {
   VerifySave,
   getBlogsforUserPage
 } = require("../controllers/userController");
+const attachRedis = require("../middleware/redismiddleware");
+
 
 const router = express.Router();
 
@@ -31,5 +33,5 @@ router.route("/blogs/like/:id").post(toggleLike);
 router.route("/contact").post(sendEmail);
 router.route("/saveblogs/:id").post(SavePost);
 router.route("/verifysave").get(VerifySave);
-router.route("/getblogs").get(getBlogsforUserPage)
+router.route("/getblogs").get(attachRedis, getBlogsforUserPage)
 module.exports = router;

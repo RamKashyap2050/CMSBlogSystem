@@ -7,6 +7,7 @@ const passport = require("passport");
 const Blogs = require("../models/Blogs");
 const Email = require("../models/Emails");
 const Save = require("../models/Save");
+const redis = require("../config/redis");
 
 const signup = expressAsyncHandler(async (req, res) => {
   try {
@@ -362,28 +363,45 @@ const VerifySave = expressAsyncHandler(async (req, res) => {
 });
 const getBlogsforUserPage = expressAsyncHandler(async (req, res) => {
   try {
-    const { page = 1, limit = 3 } = req.query; // Default to page 1 and limit 10
+    const { page = 1, limit = 3 } = req.query;
     const skip = (page - 1) * limit;
 
-    // Fetch paginated blogs
+    const cacheKey = `v1:blogs:page=${page}:limit=${limit}`;
+
+    // 1️⃣ Try cache first
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
+    // 2️⃣ Fetch from DB on cache miss
     const blogs = await Blogs.find({ archived: false })
       .select("title description post_image content archived")
       .skip(skip)
       .limit(Number(limit));
 
-    const totalBlogs = await Blogs.countDocuments({ archived: false }); // Total number of blogs
+    const totalBlogs = await Blogs.countDocuments({ archived: false });
 
-    res.status(200).json({
+    const response = {
       blogs,
       totalBlogs,
-      hasMore: skip + blogs.length < totalBlogs, // Determine if more data exists
+      hasMore: skip + blogs.length < totalBlogs,
+    };
+
+    // 3️⃣ Store in cache (TTL = 60s)
+    await redis.set(cacheKey, response, {
+      ex: 60, // seconds
     });
+
+    return res.status(200).json(response);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch blogs", error: error.message });
+    return res.status(500).json({
+      message: "Failed to fetch blogs",
+      error: error.message,
+    });
   }
 });
+
 
 
 module.exports = {
